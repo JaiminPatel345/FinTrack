@@ -35,12 +35,12 @@ else
     exit 1
 fi
 
-# Check npm
-if command -v npm &> /dev/null; then
-    NPM_VERSION=$(npm -v)
-    print_success "npm found: $NPM_VERSION"
+# Check yarn
+if command -v yarn &> /dev/null; then
+    YARN_VERSION=$(yarn -v)
+    print_success "yarn found: $YARN_VERSION"
 else
-    print_error "npm is not installed"
+    print_error "yarn is not installed. Please install yarn: npm install -g yarn"
     exit 1
 fi
 
@@ -72,7 +72,7 @@ echo "📦 Installing dependencies..."
 
 # Install root dependencies
 print_success "Installing root dependencies..."
-npm install
+yarn install
 
 # Install service dependencies
 echo ""
@@ -84,7 +84,7 @@ for service in "${services[@]}"; do
     if [ -d "server/$service" ]; then
         echo "  Installing $service dependencies..."
         cd "server/$service"
-        npm install
+        yarn install
         cd ../..
         print_success "$service dependencies installed"
     fi
@@ -157,14 +157,14 @@ echo "   Using Docker Compose:"
 echo "   docker-compose up -d"
 echo ""
 echo "   Or manually (in separate terminals):"
-echo "   npm run dev:gateway"
-echo "   npm run dev:auth"
-echo "   npm run dev:user"
-echo "   npm run dev:expense"
-echo "   npm run dev:approval"
-echo "   npm run dev:currency"
-echo "   npm run dev:notification"
-echo "   npm run dev:queue"
+echo "   yarn dev:gateway"
+echo "   yarn dev:auth"
+echo "   yarn dev:user"
+echo "   yarn dev:expense"
+echo "   yarn dev:approval"
+echo "   yarn dev:currency"
+echo "   yarn dev:notification"
+echo "   yarn dev:queue"
 echo ""
 echo "API Gateway will be available at http://localhost:5000"
 echo "Health check: http://localhost:5000/health"

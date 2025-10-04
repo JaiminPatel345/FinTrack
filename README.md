@@ -52,7 +52,7 @@ A comprehensive microservices-based expense management system with multi-currenc
 ./setup.sh
 
 # Or manually
-npm run install:all
+yarn install:all
 ```
 
 ### Configuration
@@ -82,14 +82,14 @@ docker-compose up -d
 
 #### Manual Start (Development)
 ```bash
-npm run dev:gateway   # Terminal 1
-npm run dev:auth      # Terminal 2
-npm run dev:user      # Terminal 3
-npm run dev:expense   # Terminal 4
-npm run dev:approval  # Terminal 5
-npm run dev:currency  # Terminal 6
-npm run dev:notification # Terminal 7
-npm run dev:queue     # Terminal 8
+yarn dev:gateway   # Terminal 1
+yarn dev:auth      # Terminal 2
+yarn dev:user      # Terminal 3
+yarn dev:expense   # Terminal 4
+yarn dev:approval  # Terminal 5
+yarn dev:currency  # Terminal 6
+yarn dev:notification # Terminal 7
+yarn dev:queue     # Terminal 8
 ```
 
 ### Verify Installation
@@ -183,10 +183,10 @@ FRONTEND_URL=http://localhost:3000
 
 ```bash
 # Run tests
-npm test
+yarn test
 
 # Test specific service
-cd server/auth-service && npm test
+cd server/auth-service && yarn test
 ```
 
 ## 🛠️ Development

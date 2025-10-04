@@ -41,14 +41,14 @@ docker-compose restart auth-service
 #### Manual Development
 ```bash
 # In separate terminals:
-npm run dev:gateway      # Port 5000
-npm run dev:auth         # Port 5001
-npm run dev:user         # Port 5002
-npm run dev:expense      # Port 5003
-npm run dev:approval     # Port 5004
-npm run dev:currency     # Port 5005
-npm run dev:notification # Port 5007
-npm run dev:queue        # Background workers
+yarn dev:gateway      # Port 5000
+yarn dev:auth         # Port 5001
+yarn dev:user         # Port 5002
+yarn dev:expense      # Port 5003
+yarn dev:approval     # Port 5004
+yarn dev:currency     # Port 5005
+yarn dev:notification # Port 5007
+yarn dev:queue        # Background workers
 ```
 
 ## 🔍 Health Checks
@@ -237,7 +237,7 @@ cat database/postgres/migrations/*.sql | psql -d expense_management
 find . -name "node_modules" -type d -exec rm -rf {} +
 
 # Reinstall
-npm run install:all
+yarn install:all
 ```
 
 ### View Service Logs
@@ -292,33 +292,33 @@ Create `.vscode/launch.json`:
       "type": "node",
       "request": "launch",
       "name": "Debug Auth Service",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev:auth"],
+      "runtimeExecutable": "yarn",
+      "runtimeArgs": ["dev:auth"],
       "skipFiles": ["<node_internals>/**"]
     }
   ]
 }
 ```
 
-## 📦 Common npm Scripts
+## 📦 Common Yarn Scripts
 
 ```bash
 # Install all dependencies
-npm run install:all
+yarn install:all
 
 # Build all services
-npm run build:all
+yarn build:all
 
 # Start specific service in dev mode
-npm run dev:gateway
-npm run dev:auth
-npm run dev:user
+yarn dev:gateway
+yarn dev:auth
+yarn dev:user
 # ... etc
 
 # Docker commands
-npm run docker:up
-npm run docker:down
-npm run docker:logs
+yarn docker:up
+yarn docker:down
+yarn docker:logs
 ```
 
 ## 🧪 Testing

@@ -14,16 +14,19 @@
     "server/queue-service"
   ],
   "scripts": {
-    "install:all": "npm install && npm install --workspaces",
-    "dev:gateway": "cd server/api-gateway && npm run dev",
-    "dev:auth": "cd server/auth-service && npm run dev",
-    "dev:user": "cd server/user-service && npm run dev",
-    "dev:expense": "cd server/expense-service && npm run dev",
-    "dev:approval": "cd server/approval-service && npm run dev",
-    "dev:currency": "cd server/currency-service && npm run dev",
-    "dev:notification": "cd server/notification-service && npm run dev",
-    "dev:queue": "cd server/queue-service && npm run dev",
-    "build:all": "npm run build --workspaces",
+    "install:all": "yarn install && yarn workspaces run install",
+    "dev:gateway": "cd server/api-gateway && yarn dev",
+    "dev:auth": "cd server/auth-service && yarn dev",
+    "dev:user": "cd server/user-service && yarn dev",
+    "dev:expense": "cd server/expense-service && yarn dev",
+    "dev:approval": "cd server/approval-service && yarn dev",
+    "dev:currency": "cd server/currency-service && yarn dev",
+    "dev:notification": "cd server/notification-service && yarn dev",
+    "dev:queue": "cd server/queue-service && yarn dev",
+    "build:all": "yarn workspaces run build",
+    "check:typescript": "./check-typescript.sh",
+    "check:build": "./check-build.sh",
+    "typecheck": "./check-build.sh",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
     "docker:logs": "docker-compose logs -f",
@@ -37,6 +40,6 @@
   },
   "engines": {
     "node": ">=18.0.0",
-    "npm": ">=9.0.0"
+    "yarn": ">=1.22.0"
   }
 }

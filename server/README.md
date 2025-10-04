@@ -66,7 +66,7 @@ database/
 
 2. **Install dependencies**
    ```bash
-   npm run install:all
+   yarn install:all
    ```
 
 3. **Set up environment variables**
@@ -106,28 +106,28 @@ database/
 #### Development Mode (Individual Services)
 ```bash
 # Terminal 1 - API Gateway
-npm run dev:gateway
+yarn dev:gateway
 
 # Terminal 2 - Auth Service
-npm run dev:auth
+yarn dev:auth
 
 # Terminal 3 - User Service
-npm run dev:user
+yarn dev:user
 
 # Terminal 4 - Expense Service
-npm run dev:expense
+yarn dev:expense
 
 # Terminal 5 - Approval Service
-npm run dev:approval
+yarn dev:approval
 
 # Terminal 6 - Currency Service
-npm run dev:currency
+yarn dev:currency
 
 # Terminal 7 - Notification Service
-npm run dev:notification
+yarn dev:notification
 
 # Terminal 8 - Queue Service
-npm run dev:queue
+yarn dev:queue
 ```
 
 #### Using Docker Compose
@@ -238,13 +238,13 @@ Each service requires specific environment variables. See `.env.example` in each
 
 ```bash
 # Unit tests
-npm test
+yarn test
 
 # Integration tests
-npm run test:integration
+yarn test:integration
 
 # E2E tests
-npm run test:e2e
+yarn test:e2e
 ```
 
 ## 📝 Key Features

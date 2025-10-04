@@ -7,7 +7,7 @@ This guide will help you set up and run the expense management system backend on
 Before you begin, ensure you have the following installed:
 
 - **Node.js** >= 18.0.0 ([Download](https://nodejs.org/))
-- **npm** >= 9.0.0 (comes with Node.js)
+- **Yarn** >= 1.22.0 ([Install](https://classic.yarnpkg.com/en/docs/install))
 - **PostgreSQL** >= 15 ([Download](https://www.postgresql.org/download/))
 - **MongoDB** >= 7 ([Download](https://www.mongodb.com/try/download/community))
 - **Redis** >= 7 (Optional, for caching) ([Download](https://redis.io/download))
@@ -132,28 +132,28 @@ Open 8 separate terminal windows/tabs:
 
 ```bash
 # Terminal 1 - API Gateway
-npm run dev:gateway
+yarn dev:gateway
 
 # Terminal 2 - Auth Service  
-npm run dev:auth
+yarn dev:auth
 
 # Terminal 3 - User Service
-npm run dev:user
+yarn dev:user
 
 # Terminal 4 - Expense Service
-npm run dev:expense
+yarn dev:expense
 
 # Terminal 5 - Approval Service
-npm run dev:approval
+yarn dev:approval
 
 # Terminal 6 - Currency Service
-npm run dev:currency
+yarn dev:currency
 
 # Terminal 7 - Notification Service
-npm run dev:notification
+yarn dev:notification
 
 # Terminal 8 - Queue Service
-npm run dev:queue
+yarn dev:queue
 ```
 
 ### 6. Verify Installation
@@ -363,8 +363,8 @@ psql -d expense_management -c "GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO po
 docker-compose logs -f service-name
 
 # Manual (use PM2 or similar)
-npm install -g pm2
-pm2 start npm --name "api-gateway" -- run dev:gateway
+yarn global add pm2
+pm2 start yarn --name "api-gateway" -- dev:gateway
 pm2 logs api-gateway
 ```
 
