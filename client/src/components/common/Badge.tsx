@@ -1,22 +1,43 @@
-﻿import React from 'react';
-import { classNames } from '@utils/helpers';
+import { Badge as ChakraBadge } from '@chakra-ui/react';
+import type { BadgeProps as ChakraBadgeProps } from '@chakra-ui/react';
 
-interface BadgeProps {
+interface BadgeProps extends Omit<ChakraBadgeProps, 'colorScheme'> {
   children: React.ReactNode;
-  variant?: 'default' | 'success' | 'warning' | 'danger' | 'info';
-  className?: string;
+  variant?: 'solid' | 'subtle' | 'outline';
+  colorScheme?: 'green' | 'blue' | 'red' | 'yellow' | 'gray' | 'orange' | 'purple';
 }
 
-const variantClasses: Record<NonNullable<BadgeProps['variant']>, string> = {
-  default: 'bg-neutral-100 text-neutral-700',
-  success: 'bg-success-light text-success',
-  warning: 'bg-warning-light text-warning-dark',
-  danger: 'bg-error-light text-error',
-  info: 'bg-primary-50 text-primary-600',
+export const Badge: React.FC<BadgeProps> = ({
+  children,
+  variant = 'subtle',
+  colorScheme = 'blue',
+  ...props
+}) => {
+  return (
+    <ChakraBadge variant={variant} colorPalette={colorScheme} {...props}>
+      {children}
+    </ChakraBadge>
+  );
 };
 
-export const Badge: React.FC<BadgeProps> = ({ children, variant = 'default', className }) => (
-  <span className={classNames('inline-flex items-center rounded-full px-3 py-1 text-xs font-medium', variantClasses[variant], className)}>
-    {children}
-  </span>
-);
+// Status-specific badges
+export const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
+  const getColorScheme = (status: string) => {
+    const statusMap: Record<string, 'green' | 'blue' | 'red' | 'yellow' | 'gray' | 'orange'> = {
+      draft: 'gray',
+      submitted: 'blue',
+      pending_approval: 'yellow',
+      approved: 'green',
+      rejected: 'red',
+      paid: 'green',
+      pending: 'yellow',
+    };
+    return statusMap[status.toLowerCase()] || 'gray';
+  };
+
+  return (
+    <Badge colorScheme={getColorScheme(status)}>
+      {status.replace('_', ' ').toUpperCase()}
+    </Badge>
+  );
+};

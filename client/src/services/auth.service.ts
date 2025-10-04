@@ -1,46 +1,59 @@
-﻿import api from './api';
-import { 
-  SignupFormData, 
-  SigninFormData, 
-  ForgotPasswordFormData, 
-  ResetPasswordFormData,
-  AuthResponse 
-} from '@types/auth.types';
+import apiClient from './apiClient';
+import type { SignupRequest, SignupResponse, SigninRequest, SigninResponse, ForgotPasswordRequest, ResetPasswordRequest } from '../types/auth.types';
+import { setAuthToken, removeAuthToken } from '../utils/helpers';
 
 export const authService = {
-  // Signup (Admin creates company)
-  signup: async (data: SignupFormData): Promise<AuthResponse> => {
-    const response = await api.post('/auth/signup', data);
-    return response.data;
+  /**
+   * Signup new user
+   */
+  signup: async (data: SignupRequest): Promise<SignupResponse> => {
+    const response = await apiClient.post<{ data: SignupResponse }>('/api/auth/signup', data);
+    if (response.data.data.token) {
+      setAuthToken(response.data.data.token);
+    }
+    return response.data.data;
   },
 
-  // Signin
-  signin: async (data: SigninFormData): Promise<AuthResponse> => {
-    const response = await api.post('/auth/signin', data);
-    return response.data;
+  /**
+   * Signin user
+   */
+  signin: async (data: SigninRequest): Promise<SigninResponse> => {
+    const response = await apiClient.post<{ data: SigninResponse }>('/api/auth/signin', data);
+    if (response.data.data.token) {
+      setAuthToken(response.data.data.token);
+    }
+    return response.data.data;
   },
 
-  // Forgot Password
-  forgotPassword: async (data: ForgotPasswordFormData) => {
-    const response = await api.post('/auth/forgot-password', data);
-    return response.data;
+  /**
+   * Forgot password
+   */
+  forgotPassword: async (data: ForgotPasswordRequest): Promise<{ message: string }> => {
+    const response = await apiClient.post<{ data: { message: string } }>('/api/auth/forgot-password', data);
+    return response.data.data;
   },
 
-  // Reset Password
-  resetPassword: async (token: string, data: ResetPasswordFormData) => {
-    const response = await api.post('/auth/reset-password', { token, ...data });
-    return response.data;
+  /**
+   * Reset password
+   */
+  resetPassword: async (data: ResetPasswordRequest): Promise<{ message: string }> => {
+    const response = await apiClient.post<{ data: { message: string } }>('/api/auth/reset-password', data);
+    return response.data.data;
   },
 
-  // Verify Token
-  verifyToken: async () => {
-    const response = await api.post('/auth/verify-token');
-    return response.data;
+  /**
+   * Logout user
+   */
+  logout: () => {
+    removeAuthToken();
+    window.location.href = '/signin';
   },
 
-  // Refresh Token
-  refreshToken: async () => {
-    const response = await api.post('/auth/refresh-token');
-    return response.data;
+  /**
+   * Get current user
+   */
+  getCurrentUser: async () => {
+    const response = await apiClient.get('/api/auth/me');
+    return response.data.data;
   },
 };

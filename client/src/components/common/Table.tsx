@@ -1,50 +1,63 @@
-﻿import React from 'react';
+import { Table as ChakraTable } from '@chakra-ui/react';
+import type { ReactNode } from 'react';
 
 interface Column<T> {
-  key: keyof T | string;
   header: string;
-  render?: (row: T) => React.ReactNode;
-  className?: string;
+  accessor: keyof T | ((row: T) => ReactNode);
+  width?: string;
 }
 
 interface TableProps<T> {
   data: T[];
   columns: Column<T>[];
-  emptyState?: React.ReactNode;
+  isLoading?: boolean;
+  emptyMessage?: string;
 }
 
-export function Table<T>({ data, columns, emptyState }: TableProps<T>) {
+export function Table<T extends { id?: string | number }>({
+  data,
+  columns,
+  isLoading,
+  emptyMessage = 'No data available',
+}: TableProps<T>) {
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center py-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (data.length === 0) {
+    return (
+      <div className="text-center py-8 text-gray-500">{emptyMessage}</div>
+    );
+  }
+
   return (
-    <div className="overflow-hidden rounded-xl border border-neutral-200 shadow-soft">
-      <table className="w-full text-left">
-        <thead className="bg-neutral-50 text-sm uppercase tracking-wider text-neutral-500">
-          <tr>
-            {columns.map((column) => (
-              <th key={String(column.key)} className={px-4 py-3 }>
-                {column.header}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-neutral-100 text-sm">
-          {data.length === 0 && (
-            <tr>
-              <td colSpan={columns.length} className="px-6 py-10 text-center text-neutral-500">
-                {emptyState || 'No records found'}
-              </td>
-            </tr>
-          )}
-          {data.map((row, index) => (
-            <tr key={index} className="hover:bg-neutral-50 transition-colors">
-              {columns.map((column) => (
-                <td key={String(column.key)} className={px-4 py-4 }>
-                  {column.render ? column.render(row) : (row as any)[column.key]}
-                </td>
-              ))}
-            </tr>
+    <ChakraTable.Root variant="outline">
+      <ChakraTable.Header>
+        <ChakraTable.Row>
+          {columns.map((column, index) => (
+            <ChakraTable.ColumnHeader key={index} width={column.width}>
+              {column.header}
+            </ChakraTable.ColumnHeader>
           ))}
-        </tbody>
-      </table>
-    </div>
+        </ChakraTable.Row>
+      </ChakraTable.Header>
+      <ChakraTable.Body>
+        {data.map((row, rowIndex) => (
+          <ChakraTable.Row key={row.id || rowIndex}>
+            {columns.map((column, colIndex) => (
+              <ChakraTable.Cell key={colIndex}>
+                {typeof column.accessor === 'function'
+                  ? column.accessor(row)
+                  : (row[column.accessor] as ReactNode)}
+              </ChakraTable.Cell>
+            ))}
+          </ChakraTable.Row>
+        ))}
+      </ChakraTable.Body>
+    </ChakraTable.Root>
   );
 }

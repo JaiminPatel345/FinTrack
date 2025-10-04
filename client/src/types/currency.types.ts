@@ -1,24 +1,30 @@
-﻿export interface Country {
-  name: string;
-  currency: string;
-  currencyName: string;
-}
-
 export interface ExchangeRate {
+  id: string;
   baseCurrency: string;
   targetCurrency: string;
   rate: number;
   effectiveDate: string;
+  source: string;
+  createdAt: string;
 }
 
-export interface CurrencyConversionRequest {
+export interface ConvertCurrencyRequest {
   amount: number;
   fromCurrency: string;
   toCurrency: string;
   date?: string;
 }
 
-export interface CurrencyConversionResponse {
+export interface ConvertCurrencyResponse {
   convertedAmount: number;
-  exchangeRate: number;
+  rate: number;
+  fromCurrency: string;
+  toCurrency: string;
+  date: string;
+}
+
+export interface Currency {
+  code: string;
+  name: string;
+  symbol: string;
 }

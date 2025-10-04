@@ -1,82 +1,31 @@
-import React, { useMemo } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Card } from '@components/common/Card';
-import { Button } from '@components/common/Button';
-import { Badge } from '@components/common/Badge';
-import { StatusTimeline } from '@components/expenses/StatusTimeline';
-import { formatCurrency, formatDate, formatStatus } from '@utils/formatters';
-import { useGetExpenseQuery } from '@store/api/expensesApi';
+import { useParams, Link } from 'react-router-dom';
+import { DashboardLayout } from '../../components/layout/DashboardLayout';
+import { Card } from '../../components/common/Card';
+import { Button } from '../../components/common/Button';
+import { ArrowLeft } from 'lucide-react';
 
-export const ExpenseDetails: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-
-  const { data: expense, isFetching } = useGetExpenseQuery(id!, { skip: !id });
-
-  const steps = useMemo(() => {
-    if (!expense) return [];
-    return [
-      {
-        title: 'Draft created',
-        description: expense.userName,
-        status: 'completed' as const,
-        timestamp: formatDate(expense.createdAt),
-      },
-      {
-        title: formatStatus(expense.status),
-        description: expense.remarks,
-        status: expense.status === 'approved' ? 'completed' : expense.status === 'rejected' ? 'rejected' : 'current',
-        timestamp: expense.submittedAt ? formatDate(expense.submittedAt) : undefined,
-      },
-    ];
-  }, [expense]);
-
-  if (!expense || isFetching) {
-    return <p>Loading expense...</p>;
-  }
+const ExpenseDetails = () => {
+  const { id } = useParams();
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-lg font-semibold text-neutral-900">Expense details</h1>
-          <p className="text-sm text-neutral-500">Expense ID: {expense.id}</p>
+    <DashboardLayout>
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <Link to="/expenses">
+            <Button variant="ghost" className="flex items-center gap-2">
+              <ArrowLeft size={18} />
+              Back
+            </Button>
+          </Link>
+          <h1 className="text-3xl font-bold text-gray-900">Expense Details</h1>
         </div>
-        <Button variant="outline" onClick={() => navigate(-1)}>
-          Back
-        </Button>
+
+        <Card>
+          <p className="text-gray-600">Expense details for ID: {id}</p>
+          {/* Expense details component will be added here */}
+        </Card>
       </div>
-
-      <Card>
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <h2 className="text-xl font-semibold text-neutral-900">{expense.description}</h2>
-            <p className="text-sm text-neutral-500">
-              {expense.categoryName} • {formatDate(expense.expenseDate)}
-            </p>
-            <div className="mt-3 flex items-center gap-2">
-              <Badge variant="info">{formatStatus(expense.status)}</Badge>
-              <span className="text-sm text-neutral-500">Paid by {expense.paidBy}</span>
-            </div>
-          </div>
-          <div className="text-right">
-            <p className="text-3xl font-bold text-neutral-900">
-              {formatCurrency(expense.amount, expense.currency)}
-            </p>
-            {expense.convertedAmount && (
-              <p className="text-xs text-neutral-500">
-                {formatCurrency(expense.convertedAmount, expense.companyCurrency)}
-              </p>
-            )}
-          </div>
-        </div>
-      </Card>
-
-      <Card>
-        <h3 className="text-lg font-semibold text-neutral-900">Approval timeline</h3>
-        <StatusTimeline steps={steps} />
-      </Card>
-    </div>
+    </DashboardLayout>
   );
 };
 

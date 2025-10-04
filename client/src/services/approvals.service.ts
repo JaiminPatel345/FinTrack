@@ -1,58 +1,83 @@
-﻿import api from './api';
-import { ApprovalRule, PendingApproval } from '@types/approval.types';
+import apiClient from './apiClient';
+import type { ApprovalRule, CreateApprovalRuleRequest, UpdateApprovalRuleRequest, ExpenseApproval } from '../types/approval.types';
 
 export const approvalsService = {
-  // Get all approval rules
-  getApprovalRules: async () => {
-    const response = await api.get('/approval-rules');
-    return response.data;
+  /**
+   * Get all approval rules
+   */
+  getRules: async (): Promise<ApprovalRule[]> => {
+    const response = await apiClient.get<{ data: ApprovalRule[] }>('/api/approvals/rules');
+    return response.data.data;
   },
 
-  // Get approval rule by ID
-  getApprovalRule: async (id: string) => {
-    const response = await api.get(`/approval-rules/${id}`);
-    return response.data;
+  /**
+   * Get approval rule by ID
+   */
+  getRuleById: async (id: string): Promise<ApprovalRule> => {
+    const response = await apiClient.get<{ data: ApprovalRule }>(`/api/approvals/rules/${id}`);
+    return response.data.data;
   },
 
-  // Create approval rule (Admin only)
-  createApprovalRule: async (data: Omit<ApprovalRule, 'id' | 'companyId' | 'createdAt'>) => {
-    const response = await api.post('/approval-rules', data);
-    return response.data;
+  /**
+   * Create approval rule
+   */
+  createRule: async (data: CreateApprovalRuleRequest): Promise<ApprovalRule> => {
+    const response = await apiClient.post<{ data: ApprovalRule }>('/api/approvals/rules', data);
+    return response.data.data;
   },
 
-  // Update approval rule
-  updateApprovalRule: async (id: string, data: Partial<ApprovalRule>) => {
-    const response = await api.put(`/approval-rules/${id}`, data);
-    return response.data;
+  /**
+   * Update approval rule
+   */
+  updateRule: async (id: string, data: UpdateApprovalRuleRequest): Promise<ApprovalRule> => {
+    const response = await apiClient.put<{ data: ApprovalRule }>(`/api/approvals/rules/${id}`, data);
+    return response.data.data;
   },
 
-  // Delete approval rule
-  deleteApprovalRule: async (id: string) => {
-    const response = await api.delete(`/approval-rules/${id}`);
-    return response.data;
+  /**
+   * Delete approval rule
+   */
+  deleteRule: async (id: string): Promise<void> => {
+    await apiClient.delete(`/api/approvals/rules/${id}`);
   },
 
-  // Get pending approvals for current user
-  getPendingApprovals: async () => {
-    const response = await api.get('/approvals/pending');
-    return response.data;
+  /**
+   * Get pending approvals
+   */
+  getPendingApprovals: async (): Promise<ExpenseApproval[]> => {
+    const response = await apiClient.get<{ data: ExpenseApproval[] }>('/api/approvals/pending');
+    return response.data.data;
   },
 
-  // Approve expense
-  approveExpense: async (approvalId: string, comments?: string) => {
-    const response = await api.post(`/approvals/${approvalId}/approve`, { comments });
-    return response.data;
+  /**
+   * Get approval by expense ID
+   */
+  getByExpenseId: async (expenseId: string): Promise<ExpenseApproval> => {
+    const response = await apiClient.get<{ data: ExpenseApproval }>(`/api/approvals/expense/${expenseId}`);
+    return response.data.data;
   },
 
-  // Reject expense
-  rejectExpense: async (approvalId: string, comments: string) => {
-    const response = await api.post(`/approvals/${approvalId}/reject`, { comments });
-    return response.data;
+  /**
+   * Approve expense
+   */
+  approve: async (approvalId: string, comments?: string): Promise<ExpenseApproval> => {
+    const response = await apiClient.post<{ data: ExpenseApproval }>(`/api/approvals/${approvalId}/approve`, { comments });
+    return response.data.data;
   },
 
-  // Get approval details for expense
-  getApprovalDetails: async (expenseId: string) => {
-    const response = await api.get(`/approvals/${expenseId}`);
-    return response.data;
+  /**
+   * Reject expense
+   */
+  reject: async (approvalId: string, comments: string): Promise<ExpenseApproval> => {
+    const response = await apiClient.post<{ data: ExpenseApproval }>(`/api/approvals/${approvalId}/reject`, { comments });
+    return response.data.data;
+  },
+
+  /**
+   * Get approval history
+   */
+  getHistory: async (expenseId: string): Promise<any[]> => {
+    const response = await apiClient.get(`/api/approvals/expense/${expenseId}/history`);
+    return response.data.data;
   },
 };

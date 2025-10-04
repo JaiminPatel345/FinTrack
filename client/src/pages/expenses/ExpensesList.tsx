@@ -1,61 +1,119 @@
-import React, { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ExpenseList } from '@components/expenses/ExpenseList';
-import { ExpenseFilters } from '@components/expenses/ExpenseFilters';
-import { Button } from '@components/common/Button';
-import { useExpenses } from '@hooks/useExpenses';
-import { useGetCategoriesQuery } from '@store/api/expensesApi';
-import type { Category } from '@types/expense.types';
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '../../hooks/redux';
+import { fetchExpenses } from '../../store/slices/expensesSlice';
+import { DashboardLayout } from '../../components/layout/DashboardLayout';
+import { Card } from '../../components/common/Card';
+import { Button } from '../../components/common/Button';
+import { Table } from '../../components/common/Table';
+import { Loader } from '../../components/common/Loader';
+import { StatusBadge } from '../../components/common/Badge';
+import { Select } from '../../components/common/Select';
+import { Plus, Search } from 'lucide-react';
+import { formatCurrency, formatDate } from '../../utils/formatters';
+import type { Expense } from '../../types/expense.types';
 
-export const ExpensesList: React.FC = () => {
-  const navigate = useNavigate();
-  const [status, setStatus] = useState('');
-  const [categoryId, setCategoryId] = useState('');
-  const [startDate, setStartDate] = useState<string | undefined>();
-  const [endDate, setEndDate] = useState<string | undefined>();
+const ExpensesList = () => {
+  const dispatch = useAppDispatch();
+  const { expenses, isLoading } = useAppSelector((state) => state.expenses);
+  const [statusFilter, setStatusFilter] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const { data: categoriesResponse } = useGetCategoriesQuery();
-  const categories = useMemo<Category[]>(() => categoriesResponse?.categories ?? [], [categoriesResponse?.categories]);
+  useEffect(() => {
+    dispatch(fetchExpenses({ status: statusFilter || undefined }));
+  }, [dispatch, statusFilter]);
 
-  const { expenses, loading, submitExpense, deleteExpense } = useExpenses({
-    status,
-    categoryId,
-    startDate,
-    endDate,
-  });
+  const columns = [
+    {
+      header: 'Description',
+      accessor: (row: Expense) => row.description,
+    },
+    {
+      header: 'Amount',
+      accessor: (row: Expense) => formatCurrency(row.convertedAmount, row.companyCurrency),
+    },
+    {
+      header: 'Category',
+      accessor: (row: Expense) => row.categoryName,
+    },
+    {
+      header: 'Date',
+      accessor: (row: Expense) => formatDate(row.date),
+    },
+    {
+      header: 'Status',
+      accessor: (row: Expense) => <StatusBadge status={row.status} />,
+    },
+    {
+      header: 'Actions',
+      accessor: (row: Expense) => (
+        <Link to={`/expenses/${row.id}`}>
+          <Button size="sm" variant="ghost">
+            View
+          </Button>
+        </Link>
+      ),
+    },
+  ];
+
+  const filteredExpenses = expenses.filter((expense) =>
+    expense.description.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-lg font-semibold text-neutral-900">Expenses</h1>
-          <p className="text-sm text-neutral-500">Filter, submit, and review all expenses across statuses.</p>
+    <DashboardLayout>
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold text-gray-900">My Expenses</h1>
+          <Link to="/expenses/create">
+            <Button className="flex items-center gap-2">
+              <Plus size={18} />
+              Create Expense
+            </Button>
+          </Link>
         </div>
-        <Button onClick={() => navigate('/expenses/create')}>Create expense</Button>
+
+        <Card>
+          <div className="flex gap-4 mb-6">
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <input
+                  type="text"
+                  placeholder="Search expenses..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+            </div>
+            <Select
+              placeholder="All Status"
+              options={[
+                { value: '', label: 'All Status' },
+                { value: 'draft', label: 'Draft' },
+                { value: 'submitted', label: 'Submitted' },
+                { value: 'pending_approval', label: 'Pending Approval' },
+                { value: 'approved', label: 'Approved' },
+                { value: 'rejected', label: 'Rejected' },
+              ]}
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+            />
+          </div>
+
+          {isLoading ? (
+            <Loader />
+          ) : (
+            <Table
+              data={filteredExpenses}
+              columns={columns}
+              emptyMessage="No expenses found"
+            />
+          )}
+        </Card>
       </div>
-
-      <ExpenseFilters
-        categories={categories}
-        status={status}
-        onStatusChange={setStatus}
-        categoryId={categoryId}
-        onCategoryChange={setCategoryId}
-        startDate={startDate}
-        endDate={endDate}
-        onDateChange={({ startDate: start, endDate: end }) => {
-          setStartDate(start);
-          setEndDate(end);
-        }}
-      />
-
-      <ExpenseList
-        expenses={expenses}
-        loading={loading}
-        onSubmit={submitExpense}
-        onDelete={deleteExpense}
-        onEdit={(expense) => navigate(`/expenses/${expense.id}/edit`)}
-      />
-    </div>
+    </DashboardLayout>
   );
 };
 

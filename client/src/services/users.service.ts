@@ -1,52 +1,67 @@
-﻿import api from './api';
-import { CreateUserFormData, UsersResponse } from '@types/user.types';
+import apiClient from './apiClient';
+import type { User, CreateUserRequest, UpdateUserRequest } from '../types/user.types';
 
 export const usersService = {
-  // Get all users in company
-  getUsers: async (): Promise<UsersResponse> => {
-    const response = await api.get('/users');
-    return response.data;
+  /**
+   * Get all users
+   */
+  getAll: async (): Promise<User[]> => {
+    const response = await apiClient.get<{ data: User[] }>('/api/users');
+    return response.data.data;
   },
 
-  // Get user by ID
-  getUser: async (id: string) => {
-    const response = await api.get(`/users/${id}`);
-    return response.data;
+  /**
+   * Get user by ID
+   */
+  getById: async (id: string): Promise<User> => {
+    const response = await apiClient.get<{ data: User }>(`/api/users/${id}`);
+    return response.data.data;
   },
 
-  // Create user (Admin only)
-  createUser: async (data: CreateUserFormData) => {
-    const response = await api.post('/users', data);
-    return response.data;
+  /**
+   * Create new user
+   */
+  create: async (data: CreateUserRequest): Promise<User> => {
+    const response = await apiClient.post<{ data: User }>('/api/users', data);
+    return response.data.data;
   },
 
-  // Update user
-  updateUser: async (id: string, data: Partial<CreateUserFormData>) => {
-    const response = await api.put(`/users/${id}`, data);
-    return response.data;
+  /**
+   * Update user
+   */
+  update: async (id: string, data: UpdateUserRequest): Promise<User> => {
+    const response = await apiClient.put<{ data: User }>(`/api/users/${id}`, data);
+    return response.data.data;
   },
 
-  // Deactivate user
-  deactivateUser: async (id: string) => {
-    const response = await api.delete(`/users/${id}`);
-    return response.data;
+  /**
+   * Delete user (soft delete)
+   */
+  delete: async (id: string): Promise<void> => {
+    await apiClient.delete(`/api/users/${id}`);
   },
 
-  // Send password setup email
-  sendPasswordEmail: async (id: string) => {
-    const response = await api.post(`/users/${id}/send-password`);
-    return response.data;
+  /**
+   * Get managers list
+   */
+  getManagers: async (): Promise<User[]> => {
+    const response = await apiClient.get<{ data: User[] }>('/api/users?role=manager');
+    return response.data.data;
   },
 
-  // Get user's manager
-  getManager: async (id: string) => {
-    const response = await api.get(`/users/${id}/manager`);
-    return response.data;
+  /**
+   * Send password setup email
+   */
+  sendPasswordEmail: async (userId: string): Promise<{ message: string }> => {
+    const response = await apiClient.post<{ data: { message: string } }>(`/api/users/${userId}/send-password`);
+    return response.data.data;
   },
 
-  // Assign manager
-  assignManager: async (userId: string, managerId: string) => {
-    const response = await api.post(`/users/${userId}/manager`, { managerId });
-    return response.data;
+  /**
+   * Get user statistics
+   */
+  getStats: async (): Promise<any> => {
+    const response = await apiClient.get('/api/users/stats');
+    return response.data.data;
   },
 };

@@ -1,89 +1,92 @@
-﻿import React, { useMemo } from 'react';
-import { NavLink } from 'react-router-dom';
-import { useAuthContext } from '@context/AuthContext';
+import { Link, useLocation } from 'react-router-dom';
+import { useAppSelector } from '../../hooks/redux';
 import {
-  BarChart3,
+  LayoutDashboard,
+  Receipt,
   Users,
-  ClipboardList,
+  CheckCircle,
   Settings,
-  FilePlus,
   FileText,
-  ShieldCheck,
 } from 'lucide-react';
+import { USER_ROLES } from '../../utils/constants';
 
 interface NavItem {
-  label: string;
-  to: string;
+  name: string;
+  path: string;
   icon: React.ReactNode;
-  roles?: Array<'admin' | 'manager' | 'employee'>;
+  roles: string[];
 }
 
-export const Sidebar: React.FC = () => {
-  const { user } = useAuthContext();
+const navItems: NavItem[] = [
+  {
+    name: 'Dashboard',
+    path: '/dashboard',
+    icon: <LayoutDashboard size={20} />,
+    roles: [USER_ROLES.ADMIN, USER_ROLES.MANAGER, USER_ROLES.EMPLOYEE],
+  },
+  {
+    name: 'Expenses',
+    path: '/expenses',
+    icon: <Receipt size={20} />,
+    roles: [USER_ROLES.ADMIN, USER_ROLES.MANAGER, USER_ROLES.EMPLOYEE],
+  },
+  {
+    name: 'Approvals',
+    path: '/approvals',
+    icon: <CheckCircle size={20} />,
+    roles: [USER_ROLES.ADMIN, USER_ROLES.MANAGER],
+  },
+  {
+    name: 'Users',
+    path: '/users',
+    icon: <Users size={20} />,
+    roles: [USER_ROLES.ADMIN],
+  },
+  {
+    name: 'Approval Rules',
+    path: '/approval-rules',
+    icon: <Settings size={20} />,
+    roles: [USER_ROLES.ADMIN],
+  },
+  {
+    name: 'Reports',
+    path: '/reports',
+    icon: <FileText size={20} />,
+    roles: [USER_ROLES.ADMIN, USER_ROLES.MANAGER],
+  },
+];
 
-  const navItems = useMemo<NavItem[]>(
-    () => [
-      { label: 'Dashboard', to: '/dashboard', icon: <BarChart3 className="h-4 w-4" /> },
-      { label: 'My Expenses', to: '/expenses', icon: <FileText className="h-4 w-4" /> },
-      { label: 'Create Expense', to: '/expenses/create', icon: <FilePlus className="h-4 w-4" /> },
-      {
-        label: 'Users',
-        to: '/users',
-        icon: <Users className="h-4 w-4" />,
-        roles: ['admin'],
-      },
-      {
-        label: 'Approval Rules',
-        to: '/approval-rules',
-        icon: <Settings className="h-4 w-4" />,
-        roles: ['admin'],
-      },
-      {
-        label: 'Pending Approvals',
-        to: '/pending-approvals',
-        icon: <ClipboardList className="h-4 w-4" />,
-        roles: ['manager'],
-      },
-      {
-        label: 'Approvals Overview',
-        to: '/expenses/approvals',
-        icon: <ShieldCheck className="h-4 w-4" />,
-        roles: ['manager'],
-      },
-    ],
-    []
+export const Sidebar: React.FC = () => {
+  const location = useLocation();
+  const { user } = useAppSelector((state) => state.auth);
+
+  const filteredNavItems = navItems.filter((item) =>
+    item.roles.includes(user?.role || '')
   );
 
-  const filteredNavItems = navItems.filter((item) => {
-    if (!item.roles) return true;
-    return user ? item.roles.includes(user.role) : false;
-  });
-
   return (
-    <aside className="hidden w-64 flex-col border-r border-neutral-200 bg-white lg:flex">
-      <div className="px-6 py-6">
-        <div className="rounded-xl bg-primary-50 p-4">
-          <p className="text-sm font-semibold text-primary-600">Welcome back</p>
-          <p className="text-lg font-bold text-primary-700">{user?.name}</p>
+    <aside className="bg-gray-800 text-white w-64 min-h-screen">
+      <nav className="mt-6">
+        <div className="px-4 space-y-1">
+          {filteredNavItems.map((item) => {
+            const isActive = location.pathname === item.path;
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                  isActive
+                    ? 'bg-blue-600 text-white'
+                    : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                }`}
+              >
+                {item.icon}
+                <span className="font-medium">{item.name}</span>
+              </Link>
+            );
+          })}
         </div>
-      </div>
-
-      <nav className="flex-1 space-y-1 px-4">
-        {filteredNavItems.map((item) => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            className={({ isActive }) =>
-              lex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition 
-            }
-          >
-            {item.icon}
-            {item.label}
-          </NavLink>
-        ))}
       </nav>
-
-      <div className="px-4 py-6 text-xs text-neutral-400">© {new Date().getFullYear()} Expense Management</div>
     </aside>
   );
 };

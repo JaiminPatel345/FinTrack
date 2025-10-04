@@ -1,62 +1,76 @@
-﻿import axios, { AxiosInstance, AxiosError } from 'axios';
-import toast from 'react-hot-toast';
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import type {
+  SignupRequest,
+  SignupResponse,
+  SigninRequest,
+  SigninResponse,
+  ForgotPasswordRequest,
+  ForgotPasswordResponse,
+  ResetPasswordRequest,
+  ResetPasswordResponse,
+} from '../types/auth.types';
+import type { ApiResponse } from '../types/common.types';
 
-const API_BASE_URL = import.meta.env.VITE_API_GATEWAY_URL || 'http://localhost:5000';
-
-const api: AxiosInstance = axios.create({
-  baseURL: `${API_BASE_URL}/api`,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  timeout: 30000,
-});
-
-// Request interceptor - Add auth token
-api.interceptors.request.use(
-  (config) => {
+const baseQuery = fetchBaseQuery({
+  baseUrl: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000',
+  prepareHeaders: (headers) => {
     const token = localStorage.getItem('token');
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      headers.set('Authorization', `Bearer ${token}`);
     }
-    return config;
+    headers.set('Content-Type', 'application/json');
+    return headers;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
+});
 
-// Response interceptor - Handle errors globally
-api.interceptors.response.use(
-  (response) => response,
-  (error: AxiosError<{ message: string }>) => {
-    if (error.response) {
-      const { status, data } = error.response;
-      
-      // Handle specific status codes
-      if (status === 401) {
-        // Unauthorized - clear token and redirect to login
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        window.location.href = '/signin';
-        toast.error('Session expired. Please login again.');
-      } else if (status === 403) {
-        toast.error('You do not have permission to perform this action.');
-      } else if (status === 404) {
-        toast.error('Resource not found.');
-      } else if (status === 500) {
-        toast.error('Server error. Please try again later.');
-      } else {
-        toast.error(data?.message || 'An error occurred.');
-      }
-    } else if (error.request) {
-      // Request made but no response
-      toast.error('Network error. Please check your connection.');
-    } else {
-      toast.error('An unexpected error occurred.');
-    }
-    
-    return Promise.reject(error);
-  }
-);
+export const api = createApi({
+  reducerPath: 'api',
+  baseQuery,
+  tagTypes: ['Auth', 'User', 'Expense', 'Approval', 'Category'],
+  endpoints: (builder) => ({
+    // Auth endpoints
+    signup: builder.mutation<ApiResponse<SignupResponse>, SignupRequest>({
+      query: (credentials) => ({
+        url: '/api/auth/signup',
+        method: 'POST',
+        body: credentials,
+      }),
+      invalidatesTags: ['Auth'],
+    }),
+    signin: builder.mutation<ApiResponse<SigninResponse>, SigninRequest>({
+      query: (credentials) => ({
+        url: '/api/auth/signin',
+        method: 'POST',
+        body: credentials,
+      }),
+      invalidatesTags: ['Auth'],
+    }),
+    forgotPassword: builder.mutation<
+      ApiResponse<ForgotPasswordResponse>,
+      ForgotPasswordRequest
+    >({
+      query: (data) => ({
+        url: '/api/auth/forgot-password',
+        method: 'POST',
+        body: data,
+      }),
+    }),
+    resetPassword: builder.mutation<
+      ApiResponse<ResetPasswordResponse>,
+      ResetPasswordRequest
+    >({
+      query: (data) => ({
+        url: '/api/auth/reset-password',
+        method: 'POST',
+        body: data,
+      }),
+    }),
+  }),
+});
 
-export default api;
+export const {
+  useSignupMutation,
+  useSigninMutation,
+  useForgotPasswordMutation,
+  useResetPasswordMutation,
+} = api;

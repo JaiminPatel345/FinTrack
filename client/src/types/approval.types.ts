@@ -1,28 +1,36 @@
-﻿export interface ApprovalRule {
+// Approval Rule Types
+export type ApprovalRuleType = 'sequential' | 'percentage' | 'specific_approver' | 'hybrid';
+export type ApprovalStatus = 'pending' | 'approved' | 'rejected';
+export type ApprovalAction = 'approved' | 'rejected';
+
+export interface ApprovalRule {
   id: string;
-  companyId: string;
   name: string;
-  description?: string;
-  categoryId?: string;
-  minAmount?: number;
+  categoryId: string;
+  categoryName?: string;
+  minAmount: number;
   maxAmount?: number;
   isManagerApprover: boolean;
-  ruleType: 'sequential' | 'percentage' | 'specific_approver' | 'hybrid';
-  percentageRequired?: number;
-  steps: ApprovalStep[];
-  isActive: boolean;
+  approvalType: ApprovalRuleType;
+  minApprovalPercentage?: number;
+  specificApproverId?: string;
+  specificApproverName?: string;
   priority: number;
+  isActive: boolean;
+  companyId: string;
+  steps: ApprovalStep[];
   createdAt: string;
+  updatedAt: string;
 }
 
 export interface ApprovalStep {
   id: string;
   approvalRuleId: string;
-  stepOrder: number;
-  approverId?: string;
+  approverId: string;
   approverName?: string;
-  roleRequired?: string;
-  isAutoApprove: boolean;
+  approverEmail?: string;
+  order: number;
+  createdAt: string;
 }
 
 export interface ExpenseApproval {
@@ -31,35 +39,64 @@ export interface ExpenseApproval {
   approvalRuleId: string;
   currentStep: number;
   totalSteps: number;
-  status: 'pending' | 'approved' | 'rejected';
-  startedAt: string;
+  status: ApprovalStatus;
   completedAt?: string;
-  actions: ApprovalAction[];
+  createdAt: string;
+  updatedAt: string;
+  actions: ApprovalActionItem[];
+  expense?: any; // Can be typed as Expense if needed
 }
 
-export interface ApprovalAction {
+export interface ApprovalActionItem {
   id: string;
   expenseApprovalId: string;
-  stepOrder: number;
   approverId: string;
-  approverName: string;
-  action: 'pending' | 'approved' | 'rejected';
+  approverName?: string;
+  approverEmail?: string;
+  stepOrder: number;
+  action: ApprovalAction | null;
   comments?: string;
   actionDate?: string;
+  createdAt: string;
 }
 
-export interface PendingApproval {
-  approvalId?: string;
-  expenseId: string;
-  description: string;
-  employeeName: string;
-  categoryName: string;
-  amount: number;
-  convertedAmount: number;
-  companyCurrency: string;
-  expenseDate: string;
-  submittedAt: string;
-  currentStep: number;
-  totalSteps: number;
-  receiptUrl?: string;
+export interface CreateApprovalRuleRequest {
+  name: string;
+  categoryId: string;
+  minAmount: number;
+  maxAmount?: number;
+  isManagerApprover: boolean;
+  approvalType: ApprovalRuleType;
+  minApprovalPercentage?: number;
+  specificApproverId?: string;
+  priority?: number;
+  steps: {
+    approverId: string;
+    order: number;
+  }[];
+}
+
+export interface UpdateApprovalRuleRequest {
+  name?: string;
+  categoryId?: string;
+  minAmount?: number;
+  maxAmount?: number;
+  isManagerApprover?: boolean;
+  approvalType?: ApprovalRuleType;
+  minApprovalPercentage?: number;
+  specificApproverId?: string;
+  priority?: number;
+  isActive?: boolean;
+  steps?: {
+    approverId: string;
+    order: number;
+  }[];
+}
+
+export interface ApproveExpenseRequest {
+  comments?: string;
+}
+
+export interface RejectExpenseRequest {
+  comments: string;
 }

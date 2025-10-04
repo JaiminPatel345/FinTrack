@@ -1,28 +1,28 @@
-﻿import axios from 'axios';
-
-const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
-const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+import axios from 'axios';
 
 export const uploadService = {
-  uploadReceipt: async (file: File, companyId: string, expenseId: string) => {
+  /**
+   * Upload file to Cloudinary
+   */
+  uploadToCloudinary: async (file: File): Promise<string> => {
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-    formData.append('folder', `expense_management/receipts/${companyId}/${expenseId}`);
+    formData.append('upload_preset', 'expense_management'); // You'll need to set this in Cloudinary
+    formData.append('folder', 'expense_management/receipts');
 
-    const response = await axios.post(
-      `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
-      formData,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      }
-    );
+    // Upload directly to Cloudinary
+    const cloudinaryUrl = 'https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/image/upload'; // Replace with your cloud name
+    
+    const response = await axios.post(cloudinaryUrl, formData);
+    return response.data.secure_url;
+  },
 
-    return {
-      url: response.data.secure_url,
-      publicId: response.data.public_id,
-    };
+  /**
+   * Delete file from Cloudinary
+   */
+  deleteFromCloudinary: async (publicId: string): Promise<void> => {
+    // This would typically be done through your backend
+    // as it requires API secret
+    await axios.post('/api/upload/delete', { publicId });
   },
 };

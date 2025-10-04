@@ -1,19 +1,23 @@
-﻿import React from 'react';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
-import { Footer } from './Footer';
+import { Toaster } from '../common/Toaster';
+import type { ReactNode } from 'react';
 
-export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+interface DashboardLayoutProps {
+  children: ReactNode;
+}
+
+export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   return (
-    <div className="min-h-screen bg-neutral-100">
+    <div className="min-h-screen bg-gray-50">
       <Header />
       <div className="flex">
         <Sidebar />
-        <main className="flex-1 px-4 py-6 sm:px-6 lg:px-10">
-          <div className="mx-auto max-w-6xl space-y-6">{children}</div>
+        <main className="flex-1 p-8">
+          <div className="max-w-7xl mx-auto">{children}</div>
         </main>
       </div>
-      <Footer />
+      <Toaster />
     </div>
   );
 };

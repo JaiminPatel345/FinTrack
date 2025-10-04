@@ -1,18 +1,18 @@
-﻿import React from 'react';
-import { usePendingApprovals } from '@hooks/useApprovals';
-import { ApprovalsList } from '@components/approvals/ApprovalsList';
+import { DashboardLayout } from '../../components/layout/DashboardLayout';
+import { Card } from '../../components/common/Card';
 
-export const PendingApprovals: React.FC = () => {
-  const { pending, loading, approve, reject } = usePendingApprovals();
-
+const PendingApprovals = () => {
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-lg font-semibold text-neutral-900">Pending approvals</h1>
-        <p className="text-sm text-neutral-500">Review expenses requiring your sign-off.</p>
+    <DashboardLayout>
+      <div className="space-y-6">
+        <h1 className="text-3xl font-bold text-gray-900">Pending Approvals</h1>
+
+        <Card>
+          <p className="text-gray-600">Pending approvals list will be implemented here...</p>
+          {/* Approvals list component will be added here */}
+        </Card>
       </div>
-      <ApprovalsList approvals={pending} loading={loading} onApprove={approve} onReject={reject} />
-    </div>
+    </DashboardLayout>
   );
 };
 

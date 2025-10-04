@@ -1,19 +1,34 @@
-﻿import React from 'react';
-import { motion } from 'framer-motion';
+import { Spinner } from '@chakra-ui/react';
 
 interface LoaderProps {
-  size?: number;
-  label?: string;
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+  text?: string;
+  fullScreen?: boolean;
 }
 
-export const Loader: React.FC<LoaderProps> = ({ size = 32, label = 'Loading...' }) => (
-  <div className="flex flex-col items-center justify-center space-y-3 py-8">
-    <motion.span
-      className="inline-flex h-12 w-12 items-center justify-center rounded-full border-4 border-primary-200 border-t-primary-500"
-      animate={{ rotate: 360 }}
-      transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
-      style={{ width: size, height: size }}
-    />
-    {label && <span className="text-sm text-neutral-500">{label}</span>}
-  </div>
-);
+export const Loader: React.FC<LoaderProps> = ({
+  size = 'md',
+  text,
+  fullScreen = false,
+}) => {
+  const content = (
+    <div className="flex flex-col items-center justify-center gap-4">
+      <Spinner size={size} colorPalette="brand" />
+      {text && <p className="text-gray-600">{text}</p>}
+    </div>
+  );
+
+  if (fullScreen) {
+    return (
+      <div className="fixed inset-0 bg-white bg-opacity-90 flex items-center justify-center z-50">
+        {content}
+      </div>
+    );
+  }
+
+  return <div className="flex items-center justify-center py-8">{content}</div>;
+};
+
+export const PageLoader: React.FC = () => {
+  return <Loader size="xl" text="Loading..." fullScreen />;
+};

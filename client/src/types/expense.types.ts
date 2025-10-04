@@ -1,58 +1,96 @@
-﻿export interface ExpenseFormData {
+import type { ExpenseStatus } from './common.types';
+
+export interface ExpenseLineItem {
+  id?: string;
   description: string;
   amount: number;
-  currency: string;
-  categoryId: string;
-  expenseDate: string;
-  paidBy: 'cash' | 'card' | 'company_card';
   gstPercentage?: number;
-  remarks?: string;
-  receiptUrl?: string;
-  receiptPublicId?: string;
 }
 
 export interface Expense {
   id: string;
-  companyId: string;
-  userId: string;
-  userName: string;
   description: string;
   amount: number;
   currency: string;
-  convertedAmount?: number;
-  companyCurrency?: string;
+  convertedAmount: number;
+  companyCurrency: string;
+  conversionRate: number;
+  date: string;
   categoryId: string;
   categoryName: string;
-  expenseDate: string;
+  receiptUrl?: string;
+  receiptPublicId?: string;
+  paidBy: string;
+  status: ExpenseStatus;
+  gstPercentage?: number;
+  remarks?: string;
+  ocrProcessed: boolean;
+  ocrConfidence?: number;
+  submittedBy: string;
+  submittedByName: string;
+  companyId: string;
+  lineItems?: ExpenseLineItem[];
+  createdAt: string;
+  updatedAt: string;
+  submittedAt?: string;
+}
+
+export interface CreateExpenseRequest {
+  description: string;
+  amount: number;
+  currency: string;
+  date: string;
+  categoryId: string;
+  receiptUrl?: string;
+  receiptPublicId?: string;
   paidBy: string;
   gstPercentage?: number;
   remarks?: string;
-  receiptUrl?: string;
-  receiptPublicId?: string;
-  status: 'draft' | 'submitted' | 'pending_approval' | 'approved' | 'rejected';
-  ocrProcessed: boolean;
-  ocrConfidence?: number;
-  submittedAt?: string;
+  lineItems?: ExpenseLineItem[];
+  submit?: boolean;
+}
+
+export interface UpdateExpenseRequest {
+  description?: string;
+  amount?: number;
+  currency?: string;
+  date?: string;
+  categoryId?: string;
+  paidBy?: string;
+  gstPercentage?: number;
+  remarks?: string;
+  lineItems?: ExpenseLineItem[];
+}
+
+export interface ExpenseCategory {
+  id: string;
+  name: string;
+  description?: string;
+  companyId: string;
+  isActive: boolean;
   createdAt: string;
-  updatedAt: string;
 }
 
 export interface Category {
   id: string;
   name: string;
   description?: string;
+  companyId: string;
+  isActive: boolean;
+  createdAt: string;
 }
 
-export interface OCRResult {
-  vendorName?: string;
-  date?: string;
-  totalAmount?: number;
-  currency?: string;
-  taxAmount?: number;
-  confidence: {
-    overall: number;
-    vendorName: number;
-    date: number;
-    amount: number;
-  };
+export interface UploadReceiptResponse {
+  url: string;
+  publicId: string;
+}
+
+export interface ExpenseFilters {
+  status?: ExpenseStatus;
+  categoryId?: string;
+  fromDate?: string;
+  toDate?: string;
+  minAmount?: number;
+  maxAmount?: number;
+  search?: string;
 }

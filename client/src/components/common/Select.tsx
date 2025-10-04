@@ -1,41 +1,51 @@
-﻿import React, { forwardRef } from 'react';
+import { Field } from '@chakra-ui/react';
 
-interface Option {
-  label: string;
+interface SelectOption {
   value: string;
+  label: string;
 }
 
-interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
+interface SelectProps {
   label?: string;
-  error?: string;
-  options?: Option[];
   placeholder?: string;
+  options: SelectOption[];
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  error?: string;
+  required?: boolean;
+  disabled?: boolean;
+  name?: string;
 }
 
-export const Select = forwardRef<HTMLSelectElement, SelectProps>(
-  ({ label, error, options = [], placeholder = 'Select an option', className = '', children, ...props }, ref) => {
-    return (
-      <label className="block text-sm">
-        {label && <span className="label mb-1">{label}</span>}
-        <select
-          ref={ref}
-          className={input appearance-none bg-white pr-10  }
-          {...props}
-        >
-          <option value="" disabled>
-            {placeholder}
+export const Select: React.FC<SelectProps> = ({
+  label,
+  placeholder,
+  options,
+  value,
+  onChange,
+  error,
+  required,
+  disabled,
+  name,
+}) => {
+  return (
+    <Field.Root invalid={!!error} required={required}>
+      {label && <Field.Label>{label}</Field.Label>}
+      <select
+        name={name}
+        value={value}
+        onChange={onChange}
+        disabled={disabled}
+        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+      >
+        {placeholder && <option value="">{placeholder}</option>}
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
           </option>
-          {options.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-          {children}
-        </select>
-        {error && <span className="mt-1 block text-xs text-error">{error}</span>}
-      </label>
-    );
-  }
-);
-
-Select.displayName = 'Select';
+        ))}
+      </select>
+      {error && <Field.ErrorText>{error}</Field.ErrorText>}
+    </Field.Root>
+  );
+};

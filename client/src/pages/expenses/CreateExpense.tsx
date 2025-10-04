@@ -1,38 +1,29 @@
-import React, { useMemo } from 'react';
-import { ExpenseForm } from '@components/expenses/ExpenseForm';
-import { Category, ExpenseFormData } from '@types/expense.types';
-import { useNavigate } from 'react-router-dom';
-import { useNotifications } from '@hooks/useNotifications';
-import { useCreateExpenseMutation, useGetCategoriesQuery } from '@store/api/expensesApi';
-import { handleApiError } from '@utils/helpers';
+import { DashboardLayout } from '../../components/layout/DashboardLayout';
+import { Card } from '../../components/common/Card';
+import { Button } from '../../components/common/Button';
+import { ArrowLeft } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
-export const CreateExpense: React.FC = () => {
-  const navigate = useNavigate();
-  const { notifyError, notifySuccess } = useNotifications();
-
-  const { data: categoryResponse, isLoading: isLoadingCategories } = useGetCategoriesQuery();
-  const [createExpenseMutation, { isLoading: isCreating }] = useCreateExpenseMutation();
-
-  const categories = useMemo<Category[]>(() => categoryResponse?.categories ?? [], [categoryResponse?.categories]);
-
-  const handleSubmit = async (data: ExpenseFormData) => {
-    try {
-      await createExpenseMutation(data).unwrap();
-      notifySuccess('Expense created');
-      navigate('/expenses');
-    } catch (error) {
-      notifyError(handleApiError(error));
-    }
-  };
-
+const CreateExpense = () => {
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-lg font-semibold text-neutral-900">New expense</h1>
-        <p className="text-sm text-neutral-500">Capture spend details, attach receipts, and submit for approval.</p>
+    <DashboardLayout>
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <Link to="/expenses">
+            <Button variant="ghost" className="flex items-center gap-2">
+              <ArrowLeft size={18} />
+              Back
+            </Button>
+          </Link>
+          <h1 className="text-3xl font-bold text-gray-900">Create Expense</h1>
+        </div>
+
+        <Card>
+          <p className="text-gray-600">Expense creation form will be implemented here...</p>
+          {/* Expense form component will be added here */}
+        </Card>
       </div>
-      <ExpenseForm categories={categories} onSubmit={handleSubmit} submitting={isCreating} loadingCategories={isLoadingCategories} />
-    </div>
+    </DashboardLayout>
   );
 };
 
