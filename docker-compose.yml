@@ -60,6 +60,7 @@ services:
     build:
       context: .
       dockerfile: ./server/api-gateway/Dockerfile
+      target: development
     container_name: expense_api_gateway
     environment:
       NODE_ENV: development
@@ -73,6 +74,9 @@ services:
       NOTIFICATION_SERVICE_URL: http://notification-service:5007
     ports:
       - "5000:5000"
+    volumes:
+      - ./server/api-gateway/src:/workspace/server/api-gateway/src
+      - ./server/shared:/workspace/server/shared
     depends_on:
       - auth-service
       - user-service
@@ -85,6 +89,7 @@ services:
     build:
       context: .
       dockerfile: ./server/auth-service/Dockerfile
+      target: development
     container_name: expense_auth_service
     environment:
       NODE_ENV: development
@@ -98,6 +103,9 @@ services:
       FRONTEND_URL: http://localhost:3000
     ports:
       - "5001:5001"
+    volumes:
+      - ./server/auth-service/src:/workspace/server/auth-service/src
+      - ./server/shared:/workspace/server/shared
     depends_on:
       postgres:
         condition: service_healthy

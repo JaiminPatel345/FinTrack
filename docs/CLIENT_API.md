@@ -24,7 +24,7 @@ All API requests go through the API Gateway. The client should only use this bas
 
 **Purpose:** First-time signup creates company and admin user.
 
-**Endpoint:** `POST /api/auth/signup`
+**Endpoint:** `POST /auth/signup`
 
 **Authentication:** Not required
 
@@ -74,7 +74,7 @@ All API requests go through the API Gateway. The client should only use this bas
 
 **Purpose:** Login for all users (Admin, Manager, Employee).
 
-**Endpoint:** `POST /api/auth/signin`
+**Endpoint:** `POST /auth/signin`
 
 **Authentication:** Not required
 
@@ -123,7 +123,7 @@ Authorization: Bearer <token>
 
 ### 3. Change Password
 
-**Endpoint:** `POST /api/auth/change-password`
+**Endpoint:** `POST /auth/change-password`
 
 **Authentication:** Required
 
@@ -147,7 +147,7 @@ Authorization: Bearer <token>
 
 ### 4. Forgot Password
 
-**Endpoint:** `POST /api/auth/forgot-password`
+**Endpoint:** `POST /auth/forgot-password`
 
 **Authentication:** Not required
 
@@ -170,7 +170,7 @@ Authorization: Bearer <token>
 
 ### 5. Reset Password
 
-**Endpoint:** `POST /api/auth/reset-password`
+**Endpoint:** `POST /auth/reset-password`
 
 **Authentication:** Not required
 
@@ -196,7 +196,7 @@ Authorization: Bearer <token>
 
 ### 6. Get All Users (Admin Only)
 
-**Endpoint:** `GET /api/users`
+**Endpoint:** `GET /users`
 
 **Authentication:** Required (Admin)
 
@@ -222,7 +222,7 @@ Authorization: Bearer <token>
 
 ### 7. Get User by ID
 
-**Endpoint:** `GET /api/users/:id`
+**Endpoint:** `GET /users/:id`
 
 **Authentication:** Required
 
@@ -247,7 +247,7 @@ Authorization: Bearer <token>
 
 **Purpose:** Admin creates Employee or Manager.
 
-**Endpoint:** `POST /api/users`
+**Endpoint:** `POST /users`
 
 **Authentication:** Required (Admin)
 
@@ -286,7 +286,7 @@ Authorization: Bearer <token>
 
 ### 9. Update User
 
-**Endpoint:** `PUT /api/users/:id`
+**Endpoint:** `PUT /users/:id`
 
 **Authentication:** Required (Admin or Self)
 
@@ -321,7 +321,7 @@ Authorization: Bearer <token>
 
 ### 10. Delete User (Deactivate)
 
-**Endpoint:** `DELETE /api/users/:id`
+**Endpoint:** `DELETE /users/:id`
 
 **Authentication:** Required (Admin)
 
@@ -347,7 +347,7 @@ Authorization: Bearer <token>
 
 **Purpose:** Admin can resend password to user.
 
-**Endpoint:** `POST /api/users/:id/send-password`
+**Endpoint:** `POST /users/:id/send-password`
 
 **Authentication:** Required (Admin)
 
@@ -364,7 +364,7 @@ Authorization: Bearer <token>
 
 ### 12. Get User's Manager
 
-**Endpoint:** `GET /api/users/:id/manager`
+**Endpoint:** `GET /users/:id/manager`
 
 **Authentication:** Required
 
@@ -393,7 +393,7 @@ Authorization: Bearer <token>
 
 ### 13. Assign Manager to User
 
-**Endpoint:** `POST /api/users/:id/manager`
+**Endpoint:** `POST /users/:id/manager`
 
 **Authentication:** Required (Admin)
 
@@ -421,7 +421,7 @@ Authorization: Bearer <token>
 
 **Purpose:** Get all employees reporting to a manager.
 
-**Endpoint:** `GET /api/users/:id/subordinates`
+**Endpoint:** `GET /users/:id/subordinates`
 
 **Authentication:** Required
 
@@ -447,7 +447,7 @@ Authorization: Bearer <token>
 
 ### 15. Get All Categories
 
-**Endpoint:** `GET /api/categories`
+**Endpoint:** `GET /categories`
 
 **Authentication:** Required
 
@@ -485,7 +485,7 @@ Authorization: Bearer <token>
 
 ### 16. Create Category (Admin Only)
 
-**Endpoint:** `POST /api/categories`
+**Endpoint:** `POST /categories`
 
 **Authentication:** Required (Admin)
 
@@ -520,7 +520,7 @@ Authorization: Bearer <token>
 
 **Purpose:** Employee creates expense (draft).
 
-**Endpoint:** `POST /api/expenses`
+**Endpoint:** `POST /expenses`
 
 **Authentication:** Required
 
@@ -580,7 +580,7 @@ Authorization: Bearer <token>
 
 **Purpose:** List expenses (filtered by role).
 
-**Endpoint:** `GET /api/expenses`
+**Endpoint:** `GET /expenses`
 
 **Authentication:** Required
 
@@ -591,7 +591,7 @@ Authorization: Bearer <token>
 - `startDate` (optional): YYYY-MM-DD
 - `endDate` (optional): YYYY-MM-DD
 
-**Example:** `GET /api/expenses?status=pending_approval&startDate=2024-10-01`
+**Example:** `GET /expenses?status=pending_approval&startDate=2024-10-01`
 
 **Access Control:**
 - **Employee**: Can see only their own expenses
@@ -627,7 +627,7 @@ Authorization: Bearer <token>
 
 ### 19. Get Expense by ID
 
-**Endpoint:** `GET /api/expenses/:id`
+**Endpoint:** `GET /expenses/:id`
 
 **Authentication:** Required
 
@@ -665,7 +665,7 @@ Authorization: Bearer <token>
 
 **Purpose:** Update draft expense only.
 
-**Endpoint:** `PUT /api/expenses/:id`
+**Endpoint:** `PUT /expenses/:id`
 
 **Authentication:** Required
 
@@ -701,7 +701,7 @@ Authorization: Bearer <token>
 
 ### 21. Delete Expense
 
-**Endpoint:** `DELETE /api/expenses/:id`
+**Endpoint:** `DELETE /expenses/:id`
 
 **Authentication:** Required
 
@@ -721,7 +721,7 @@ Authorization: Bearer <token>
 
 **Purpose:** Submit draft expense (triggers approval workflow).
 
-**Endpoint:** `POST /api/expenses/:id/submit`
+**Endpoint:** `POST /expenses/:id/submit`
 
 **Authentication:** Required
 
@@ -764,7 +764,7 @@ Authorization: Bearer <token>
 
 ### 23. Get Expense Statistics
 
-**Endpoint:** `GET /api/expenses/stats`
+**Endpoint:** `GET /expenses/stats`
 
 **Authentication:** Required
 
@@ -795,7 +795,7 @@ Authorization: Bearer <token>
 
 **Purpose:** Get expenses waiting for my approval.
 
-**Endpoint:** `GET /api/approvals/pending`
+**Endpoint:** `GET /approvals/pending`
 
 **Authentication:** Required
 
@@ -831,7 +831,7 @@ Authorization: Bearer <token>
 
 **Purpose:** View approval history for an expense.
 
-**Endpoint:** `GET /api/approvals/expense/:expenseId`
+**Endpoint:** `GET /approvals/expense/:expenseId`
 
 **Authentication:** Required
 
@@ -872,7 +872,7 @@ Authorization: Bearer <token>
 
 **Purpose:** Approve expense at current step.
 
-**Endpoint:** `POST /api/approvals/:actionId/approve`
+**Endpoint:** `POST /approvals/:actionId/approve`
 
 **Authentication:** Required
 
@@ -934,7 +934,7 @@ Authorization: Bearer <token>
 
 **Purpose:** Reject expense (entire workflow rejected).
 
-**Endpoint:** `POST /api/approvals/:actionId/reject`
+**Endpoint:** `POST /approvals/:actionId/reject`
 
 **Authentication:** Required
 
@@ -972,7 +972,7 @@ Authorization: Bearer <token>
 
 **Purpose:** View all approval rules.
 
-**Endpoint:** `GET /api/approval-rules`
+**Endpoint:** `GET /approval-rules`
 
 **Authentication:** Required (Admin)
 
@@ -1011,7 +1011,7 @@ Authorization: Bearer <token>
 
 ### 29. Create Approval Rule (Admin)
 
-**Endpoint:** `POST /api/approval-rules`
+**Endpoint:** `POST /approval-rules`
 
 **Authentication:** Required (Admin)
 
@@ -1075,7 +1075,7 @@ Authorization: Bearer <token>
 
 ### 30. Update Approval Rule (Admin)
 
-**Endpoint:** `PUT /api/approval-rules/:id`
+**Endpoint:** `PUT /approval-rules/:id`
 
 **Authentication:** Required (Admin)
 
@@ -1120,7 +1120,7 @@ Authorization: Bearer <token>
 
 **Purpose:** Get list of countries and their currencies for signup form.
 
-**Endpoint:** `GET /api/currency/countries`
+**Endpoint:** `GET /currency/countries`
 
 **Authentication:** Not required
 
@@ -1154,7 +1154,7 @@ Authorization: Bearer <token>
 
 **Purpose:** Get exchange rate between currencies.
 
-**Endpoint:** `POST /api/currency/convert`
+**Endpoint:** `POST /currency/convert`
 
 **Authentication:** Required
 
@@ -1188,11 +1188,11 @@ Authorization: Bearer <token>
 
 **Purpose:** Get all exchange rates for a base currency.
 
-**Endpoint:** `GET /api/currency/rates/:baseCurrency`
+**Endpoint:** `GET /currency/rates/:baseCurrency`
 
 **Authentication:** Required
 
-**Example:** `GET /api/currency/rates/USD`
+**Example:** `GET /currency/rates/USD`
 
 **Success Response (200):**
 ```json
@@ -1219,7 +1219,7 @@ Authorization: Bearer <token>
 
 **Purpose:** Extract text from receipt image using OCR.
 
-**Endpoint:** `POST /api/ocr/process`
+**Endpoint:** `POST /ocr/process`
 
 **Authentication:** Required
 
@@ -1323,32 +1323,32 @@ Authorization: Bearer <token>
 
 ### Flow 1: Admin Onboarding
 
-1. **Signup** → `POST /api/auth/signup` - Creates company + admin
-2. **Create Employee** → `POST /api/users` - Add team member
-3. **Assign Manager** → `POST /api/users/:id/manager` - Set reporting structure
-4. **Create Categories** → `POST /api/categories` - Add expense categories
-5. **Create Approval Rule** → `POST /api/approval-rules` - Set approval workflow
+1. **Signup** → `POST /auth/signup` - Creates company + admin
+2. **Create Employee** → `POST /users` - Add team member
+3. **Assign Manager** → `POST /users/:id/manager` - Set reporting structure
+4. **Create Categories** → `POST /categories` - Add expense categories
+5. **Create Approval Rule** → `POST /approval-rules` - Set approval workflow
 
 ### Flow 2: Employee Expense Submission
 
-1. **Login** → `POST /api/auth/signin` - Get auth token
-2. **Get Categories** → `GET /api/categories` - List available categories
+1. **Login** → `POST /auth/signin` - Get auth token
+2. **Get Categories** → `GET /categories` - List available categories
 3. **Upload Receipt** → (Use Cloudinary directly)
-4. **Create Expense** → `POST /api/expenses` - Create draft expense
-5. **Submit Expense** → `POST /api/expenses/:id/submit` - Triggers approval
+4. **Create Expense** → `POST /expenses` - Create draft expense
+5. **Submit Expense** → `POST /expenses/:id/submit` - Triggers approval
 
 ### Flow 3: Manager Approval
 
-1. **Login** → `POST /api/auth/signin` - Get auth token
-2. **Get Pending** → `GET /api/approvals/pending` - See expenses to approve
-3. **View History** → `GET /api/approvals/expense/:id` - Check approval chain
-4. **Approve/Reject** → `POST /api/approvals/:actionId/approve` or `/reject`
+1. **Login** → `POST /auth/signin` - Get auth token
+2. **Get Pending** → `GET /approvals/pending` - See expenses to approve
+3. **View History** → `GET /approvals/expense/:id` - Check approval chain
+4. **Approve/Reject** → `POST /approvals/:actionId/approve` or `/reject`
 
 ### Flow 4: Employee Check Status
 
-1. **Login** → `POST /api/auth/signin` - Get auth token
-2. **Get My Expenses** → `GET /api/expenses` - Auto-filtered to own expenses
-3. **View Approval History** → `GET /api/approvals/expense/:id` - Check status
+1. **Login** → `POST /auth/signin` - Get auth token
+2. **Get My Expenses** → `GET /expenses` - Auto-filtered to own expenses
+3. **View Approval History** → `GET /approvals/expense/:id` - Check status
 
 ---
 
@@ -1381,6 +1381,8 @@ fetch('http://localhost:5000/api/users', {
   }
 })
 ```
+
+**Note:** The base URL already includes `/api`, so endpoints are relative to that. Full URL example: `http://localhost:5000/api/users`
 
 ---
 

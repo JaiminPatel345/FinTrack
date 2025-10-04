@@ -1,6 +1,8 @@
 # Auth Service Dockerfile
 # Build context: root of workspace (.)
-FROM node:20-alpine
+
+# Base stage - shared dependencies
+FROM node:20-alpine AS base
 
 WORKDIR /workspace
 
@@ -26,8 +28,17 @@ COPY server/shared ./server/shared/
 # Copy auth-service source
 COPY server/auth-service ./server/auth-service/
 
-# Build TypeScript
 WORKDIR /workspace/server/auth-service
+
+# Development stage - with hot reload
+FROM base AS development
+
+EXPOSE 5001
+CMD ["yarn", "dev"]
+
+# Production stage - build and run optimized
+FROM base AS production
+
 RUN yarn build
 
 EXPOSE 5001

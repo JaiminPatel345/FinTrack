@@ -6,8 +6,22 @@ const createProxyConfig = (target: string, serviceName: string, pathRewrite?: Re
   changeOrigin: true,
   pathRewrite: pathRewrite || {},
   logLevel: 'debug',
-  onProxyReq: (proxyReq, req, res) => {
+  // Parse the body to allow middleware to access it, then restream to backend
+  onProxyReq: (proxyReq, req: any, res) => {
     console.log(`[${serviceName}] ${req.method} ${req.url} -> ${target}${proxyReq.path}`);
+    
+    // If body exists and is an object (parsed by body-parser), re-stream it
+    if (req.body && Object.keys(req.body).length > 0) {
+      const bodyData = JSON.stringify(req.body);
+      
+      // Update headers
+      proxyReq.setHeader('Content-Type', 'application/json');
+      proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
+      
+      // Write the body data to the proxy request
+      proxyReq.write(bodyData);
+      proxyReq.end();
+    }
   },
   onError: (err, req, res) => {
     console.error(`[${serviceName}] Proxy Error:`, err.message);

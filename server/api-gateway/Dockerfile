@@ -1,6 +1,8 @@
 # API Gateway Dockerfile
 # Build context: root of workspace (.)
-FROM node:20-alpine
+
+# Base stage - shared dependencies
+FROM node:20-alpine AS base
 
 WORKDIR /workspace
 
@@ -26,8 +28,17 @@ COPY server/shared ./server/shared/
 # Copy api-gateway source
 COPY server/api-gateway ./server/api-gateway/
 
-# Build TypeScript
 WORKDIR /workspace/server/api-gateway
+
+# Development stage - with hot reload
+FROM base AS development
+
+EXPOSE 5000
+CMD ["yarn", "dev"]
+
+# Production stage - build and run optimized
+FROM base AS production
+
 RUN yarn build
 
 EXPOSE 5000
