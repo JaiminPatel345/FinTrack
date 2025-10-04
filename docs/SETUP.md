@@ -25,7 +25,7 @@ cd hackathon
 ### 2. Run Setup Script
 
 ```bash
-./setup.sh
+./scripts/setup.sh
 ```
 
 This script will:

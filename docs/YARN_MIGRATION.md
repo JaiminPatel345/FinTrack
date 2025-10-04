@@ -11,9 +11,9 @@ All npm commands have been replaced with yarn equivalents across:
 - ✅ Changed `"npm": ">=9.0.0"` to `"yarn": ">=1.22.0"`
 
 ### 2. Scripts
-- ✅ `setup.sh` - Uses `yarn install` instead of `npm install`
-- ✅ `check-typescript.sh` - Uses `yarn tsx` instead of `npx tsx`
-- ✅ `check-build.sh` - Uses `yarn tsc` instead of `npx tsc`
+- ✅ `scripts/setup.sh` - Uses `yarn install` instead of `npm install`
+- ✅ `scripts/check-typescript.sh` - Uses `yarn tsx` instead of `npx tsx`
+- ✅ `scripts/check-build.sh` - Uses `yarn tsc` instead of `npx tsc`
 
 ### 3. Documentation
 - ✅ `README.md` - All commands updated
@@ -53,7 +53,7 @@ All npm commands have been replaced with yarn equivalents across:
    ```bash
    yarn check:build
    # or
-   ./check-build.sh
+   ./scripts/check-build.sh
    ```
 
 4. **Start services**:
@@ -72,7 +72,7 @@ All npm commands have been replaced with yarn equivalents across:
 
 ## Important Notes
 
-- The only remaining npm reference is in `setup.sh` for yarn installation: `npm install -g yarn` (this is intentional for bootstrapping)
+- The only remaining npm reference is in `scripts/setup.sh` for yarn installation: `npm install -g yarn` (this is intentional for bootstrapping)
 - All workspaces in the `server/` directory now use yarn
 - Docker containers will use yarn for dependency installation
 - CI/CD pipelines should be updated to use yarn

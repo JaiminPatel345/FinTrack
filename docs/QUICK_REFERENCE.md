@@ -5,7 +5,7 @@
 ### Setup (One-time)
 ```bash
 # Run setup script
-./setup.sh
+./scripts/setup.sh
 
 # Create PostgreSQL database
 createdb expense_management
