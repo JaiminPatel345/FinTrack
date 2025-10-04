@@ -1,0 +1,42 @@
+{
+  "name": "expense-management-system",
+  "version": "1.0.0",
+  "description": "Microservices-based Expense Management System",
+  "private": true,
+  "workspaces": [
+    "server/api-gateway",
+    "server/auth-service",
+    "server/user-service",
+    "server/expense-service",
+    "server/approval-service",
+    "server/currency-service",
+    "server/notification-service",
+    "server/queue-service"
+  ],
+  "scripts": {
+    "install:all": "npm install && npm install --workspaces",
+    "dev:gateway": "cd server/api-gateway && npm run dev",
+    "dev:auth": "cd server/auth-service && npm run dev",
+    "dev:user": "cd server/user-service && npm run dev",
+    "dev:expense": "cd server/expense-service && npm run dev",
+    "dev:approval": "cd server/approval-service && npm run dev",
+    "dev:currency": "cd server/currency-service && npm run dev",
+    "dev:notification": "cd server/notification-service && npm run dev",
+    "dev:queue": "cd server/queue-service && npm run dev",
+    "build:all": "npm run build --workspaces",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "db:migrate": "psql -h localhost -U postgres -d expense_management -f database/postgres/migrations/*.sql",
+    "db:seed": "psql -h localhost -U postgres -d expense_management -f database/postgres/seeds/*.sql",
+    "mongo:setup": "mongosh expense_management database/mongodb/collections/*.js && mongosh expense_management database/mongodb/indexes/*.js"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.6",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}
