@@ -1,97 +1,64 @@
 import { createProxyMiddleware, Options } from 'http-proxy-middleware';
 import { services } from './services.config';
 
-const proxyOptions: Record<string, Options> = {
-  auth: {
-    target: services.auth,
-    changeOrigin: true,
-    pathRewrite: { '^/api/auth': '' },
-    onError: (err, req, res) => {
-      console.error('Auth Service Proxy Error:', err);
-      (res as any).status(503).json({
-        success: false,
-        error: 'Auth service unavailable'
-      });
-    }
+const createProxyConfig = (target: string, serviceName: string, pathRewrite?: Record<string, string>): Options => ({
+  target,
+  changeOrigin: true,
+  pathRewrite: pathRewrite || {},
+  logLevel: 'debug',
+  onProxyReq: (proxyReq, req, res) => {
+    console.log(`[${serviceName}] ${req.method} ${req.url} -> ${target}${proxyReq.path}`);
   },
-  users: {
-    target: services.user,
-    changeOrigin: true,
-    pathRewrite: { '^/api/users': '' },
-    onError: (err, req, res) => {
-      console.error('User Service Proxy Error:', err);
-      (res as any).status(503).json({
-        success: false,
-        error: 'User service unavailable'
-      });
-    }
-  },
-  expenses: {
-    target: services.expense,
-    changeOrigin: true,
-    pathRewrite: { '^/api/expenses': '', '^/api/categories': '/categories' },
-    onError: (err, req, res) => {
-      console.error('Expense Service Proxy Error:', err);
-      (res as any).status(503).json({
-        success: false,
-        error: 'Expense service unavailable'
-      });
-    }
-  },
-  approvals: {
-    target: services.approval,
-    changeOrigin: true,
-    pathRewrite: { '^/api/approvals': '', '^/api/approval-rules': '/approval-rules' },
-    onError: (err, req, res) => {
-      console.error('Approval Service Proxy Error:', err);
-      (res as any).status(503).json({
-        success: false,
-        error: 'Approval service unavailable'
-      });
-    }
-  },
-  currency: {
-    target: services.currency,
-    changeOrigin: true,
-    pathRewrite: { '^/api/currency': '' },
-    onError: (err, req, res) => {
-      console.error('Currency Service Proxy Error:', err);
-      (res as any).status(503).json({
-        success: false,
-        error: 'Currency service unavailable'
-      });
-    }
-  },
-  ocr: {
-    target: services.ocr,
-    changeOrigin: true,
-    pathRewrite: { '^/api/ocr': '' },
-    onError: (err, req, res) => {
-      console.error('OCR Service Proxy Error:', err);
-      (res as any).status(503).json({
-        success: false,
-        error: 'OCR service unavailable'
-      });
-    }
-  },
-  notifications: {
-    target: services.notification,
-    changeOrigin: true,
-    pathRewrite: { '^/api/notifications': '' },
-    onError: (err, req, res) => {
-      console.error('Notification Service Proxy Error:', err);
-      (res as any).status(503).json({
-        success: false,
-        error: 'Notification service unavailable'
-      });
-    }
+  onError: (err, req, res) => {
+    console.error(`[${serviceName}] Proxy Error:`, err.message);
+    (res as any).status(503).json({
+      success: false,
+      error: `${serviceName} unavailable`,
+      details: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
   }
-};
+});
 
-export const createAuthProxy = () => createProxyMiddleware(proxyOptions.auth);
-export const createUsersProxy = () => createProxyMiddleware(proxyOptions.users);
-export const createExpensesProxy = () => createProxyMiddleware(proxyOptions.expenses);
-export const createApprovalsProxy = () => createProxyMiddleware(proxyOptions.approvals);
-export const createCurrencyProxy = () => createProxyMiddleware(proxyOptions.currency);
-export const createOcrProxy = () => createProxyMiddleware(proxyOptions.ocr);
-export const createNotificationsProxy = () => createProxyMiddleware(proxyOptions.notifications);
+// Auth service routes are mounted at root "/" (e.g., /signup, /signin)
+// So /api/auth/signup -> /signup (remove /api/auth prefix)
+export const createAuthProxy = () => createProxyMiddleware(
+  createProxyConfig(services.auth, 'Auth Service', { '^/api/auth': '' })
+);
+
+// User service routes are mounted at "/api/users"
+// So /api/users -> /api/users (no rewrite needed)
+export const createUsersProxy = () => createProxyMiddleware(
+  createProxyConfig(services.user, 'User Service')
+);
+
+// Expense service routes are mounted at "/api/expenses"
+// So /api/expenses -> /api/expenses (no rewrite)
+// Categories might be at "/api/categories" on expense service
+export const createExpensesProxy = () => createProxyMiddleware(
+  createProxyConfig(services.expense, 'Expense Service')
+);
+
+// Approval service routes are mounted at "/api/approvals"
+// So /api/approvals -> /api/approvals (no rewrite)
+// Approval rules might be at "/api/approval-rules" on approval service
+export const createApprovalsProxy = () => createProxyMiddleware(
+  createProxyConfig(services.approval, 'Approval Service')
+);
+
+// Currency service routes are mounted at "/api/currency"
+// So /api/currency -> /api/currency (no rewrite)
+export const createCurrencyProxy = () => createProxyMiddleware(
+  createProxyConfig(services.currency, 'Currency Service')
+);
+
+// OCR service routes are mounted at "/api/ocr"
+// So /api/ocr -> /api/ocr (no rewrite)
+export const createOcrProxy = () => createProxyMiddleware(
+  createProxyConfig(services.ocr, 'OCR Service')
+);
+
+// Notification service routes are mounted at "/api/notifications"
+// So /api/notifications -> /api/notifications (no rewrite)
+export const createNotificationsProxy = () => createProxyMiddleware(
+  createProxyConfig(services.notification, 'Notification Service')
+);
