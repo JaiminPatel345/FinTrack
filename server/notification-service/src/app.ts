@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import notificationRoutes from './routes/notification.routes';
+import notificationRoutes from './routes/notification.routes.js';
 
 dotenv.config();
 

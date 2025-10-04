@@ -28,9 +28,9 @@
     "check:build": "./scripts/check-build.sh",
     "typecheck": "./scripts/check-build.sh",
     "setup": "./scripts/setup.sh",
-    "docker:up": "docker-compose up -d",
-    "docker:down": "docker-compose down",
-    "docker:logs": "docker-compose logs -f",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f",
     "db:migrate": "psql -h localhost -U postgres -d expense_management -f database/postgres/migrations/*.sql",
     "db:seed": "psql -h localhost -U postgres -d expense_management -f database/postgres/seeds/*.sql",
     "mongo:setup": "mongosh expense_management database/mongodb/collections/*.js && mongosh expense_management database/mongodb/indexes/*.js"

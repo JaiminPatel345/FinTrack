@@ -1,4 +1,4 @@
-# Approval Service Dockerfile
+# Auth Service Dockerfile
 # Build context: root of workspace (.)
 FROM node:20-alpine
 
@@ -23,12 +23,12 @@ RUN yarn install --frozen-lockfile
 # Copy shared code
 COPY server/shared ./server/shared/
 
-# Copy approval-service source
-COPY server/approval-service ./server/approval-service/
+# Copy auth-service source
+COPY server/auth-service ./server/auth-service/
 
 # Build TypeScript
-WORKDIR /workspace/server/approval-service
+WORKDIR /workspace/server/auth-service
 RUN yarn build
 
-EXPOSE 5004
+EXPOSE 5001
 CMD ["node", "dist/server.js"]

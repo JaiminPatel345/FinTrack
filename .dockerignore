@@ -1,0 +1,57 @@
+# Node modules
+node_modules
+**/node_modules
+npm-debug.log
+yarn-error.log
+
+# Build artifacts
+**/dist
+**/.next
+**/build
+
+# Environment files
+.env
+.env.local
+.env.*.local
+**/.env
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentation
+docs
+*.md
+!README.md
+
+# Tests
+**/__tests__
+**/*.test.ts
+**/*.spec.ts
+
+# Python
+__pycache__
+*.py[cod]
+*.so
+.Python
+
+# Database data
+database/mongodb/data
+database/postgres/data
+
+# Logs
+logs
+*.log
+
+# Client/Frontend (not needed for backend services)
+client

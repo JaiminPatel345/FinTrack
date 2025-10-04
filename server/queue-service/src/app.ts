@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import queueRoutes from './routes/queue.routes';
+import queueRoutes from './routes/queue.routes.js';
 
 dotenv.config();
 

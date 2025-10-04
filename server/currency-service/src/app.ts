@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import currencyRoutes from './routes/currency.routes';
+import currencyRoutes from './routes/currency.routes.js';
 
 dotenv.config();
 

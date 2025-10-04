@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import approvalRoutes from './routes/approval.routes';
+import approvalRoutes from './routes/approval.routes.js';
 
 dotenv.config();
 

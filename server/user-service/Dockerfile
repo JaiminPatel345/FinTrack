@@ -1,17 +1,34 @@
-FROM node:18-alpine
+# User Service Dockerfile
+# Build context: root of workspace (.)
+FROM node:20-alpine
 
-WORKDIR /app
+WORKDIR /workspace
 
-# Copy package files
-COPY package*.json ./
-RUN npm install
+# Copy root workspace configuration
+COPY package.json yarn.lock ./
 
-# Copy source code
-COPY . .
+# Copy all service package.json files for workspace resolution
+COPY server/api-gateway/package.json ./server/api-gateway/
+COPY server/auth-service/package.json ./server/auth-service/
+COPY server/user-service/package.json ./server/user-service/
+COPY server/expense-service/package.json ./server/expense-service/
+COPY server/approval-service/package.json ./server/approval-service/
+COPY server/currency-service/package.json ./server/currency-service/
+COPY server/notification-service/package.json ./server/notification-service/
+COPY server/queue-service/package.json ./server/queue-service/
+
+# Install all workspace dependencies
+RUN yarn install --frozen-lockfile
+
+# Copy shared code
+COPY server/shared ./server/shared/
+
+# Copy user-service source
+COPY server/user-service ./server/user-service/
 
 # Build TypeScript
-RUN npm run build
+WORKDIR /workspace/server/user-service
+RUN yarn build
 
 EXPOSE 5002
-
-CMD ["npm", "start"]
+CMD ["node", "dist/server.js"]

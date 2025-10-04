@@ -1,4 +1,4 @@
-# Approval Service Dockerfile
+# API Gateway Dockerfile
 # Build context: root of workspace (.)
 FROM node:20-alpine
 
@@ -23,12 +23,12 @@ RUN yarn install --frozen-lockfile
 # Copy shared code
 COPY server/shared ./server/shared/
 
-# Copy approval-service source
-COPY server/approval-service ./server/approval-service/
+# Copy api-gateway source
+COPY server/api-gateway ./server/api-gateway/
 
 # Build TypeScript
-WORKDIR /workspace/server/approval-service
+WORKDIR /workspace/server/api-gateway
 RUN yarn build
 
-EXPOSE 5004
+EXPOSE 5000
 CMD ["node", "dist/server.js"]
