@@ -14,7 +14,7 @@
     "server/queue-service"
   ],
   "scripts": {
-    "install:all": "yarn install && yarn workspaces run install",
+    "install:all": "yarn install",
     "dev:gateway": "cd server/api-gateway && yarn dev",
     "dev:auth": "cd server/auth-service && yarn dev",
     "dev:user": "cd server/user-service && yarn dev",

@@ -22,7 +22,7 @@ const app: Express = express();
 // Security middleware
 app.use(helmet());
 app.use(cors(corsOptions));
-app.use(compression());
+app.use(compression() as any);
 
 // Body parsing
 app.use(express.json({ limit: '10mb' }));
