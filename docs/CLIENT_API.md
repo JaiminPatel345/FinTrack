@@ -145,7 +145,7 @@ Authorization: Bearer <token>
 
 ---
 
-### 4. Forgot Password
+### 4. Forgot Password [I will test this later]
 
 **Endpoint:** `POST /auth/forgot-password`
 

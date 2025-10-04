@@ -1,447 +1,291 @@
-# Expense Management System# Expense Management System
+# Do not copy my code :/ 
+### We will update name later so google can't find our repo :)
 
+A comprehensive microservices-based expense management system with multi-currency support, OCR receipt processing, and configurable approval workflows.
 
-
-A comprehensive microservices-based expense management system with multi-currency support, OCR receipt processing, and configurable approval workflows.A comprehensive microservices-based expense management system with multi-currency support, OCR receipt processing, and configurable approval workflows.
-
-
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)## 🌟 Features
-
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)](https://nodejs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue)](https://www.typescriptlang.org/)
 
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue)](https://www.typescriptlang.org/)- **Multi-Company Support**: Isolated data per company
+## 🌟 Key Features
 
-- **Role-Based Access Control**: Admin, Manager, Employee roles
-
-## 🌟 Key Features- **Multi-Currency**: Automatic currency conversion with real-time rates
-
-- **OCR Processing**: Extract data from receipt images automatically
-
-- 🏢 **Multi-Company Support** - Isolated data per company- **Flexible Approval Workflows**: Sequential, Percentage-based, Specific Approver, and Hybrid rules
-
-- 🔐 **Role-Based Access Control** - Admin, Manager, Employee roles  - **Email Notifications**: Automated emails for all key events
-
-- 💱 **Multi-Currency** - Automatic conversion with real-time rates- **Audit Trail**: Complete history of all changes
-
-- 📸 **OCR Receipt Processing** - Extract data from images automatically- **Cloudinary Integration**: Secure receipt image storage
-
+- 🏢 **Multi-Company Support** - Isolated data per company
+- 🔐 **Role-Based Access Control** - Admin, Manager, Employee roles
+- 💱 **Multi-Currency** - Automatic conversion with real-time rates
+- 📸 **OCR Receipt Processing** - Extract data from images automatically
 - ✅ **Flexible Approval Workflows** - Sequential, percentage, hybrid rules
-
-- 📧 **Email Notifications** - Automated notifications for all events## 🏗️ Architecture
-
+- 📧 **Email Notifications** - Automated notifications for all events
 - 📋 **Complete Audit Trail** - Track all changes
+- ☁️ **Cloud Storage** - Secure receipt storage with Cloudinary
 
-- ☁️ **Cloud Storage** - Secure receipt storage with Cloudinary### Backend Services (Microservices)
+## 🏗️ Architecture
 
+**Microservices Backend** with 8 independent services:
 - **API Gateway** (Port 5000): Routes requests to appropriate services
-
-## 🏗️ Architecture- **Auth Service** (Port 5001): Authentication, JWT, password management
-
+- **Auth Service** (Port 5001): Authentication, JWT, password management
 - **User Service** (Port 5002): User CRUD, manager relationships
-
-**Microservices Backend** with 8 independent services:- **Expense Service** (Port 5003): Expense management, categories
-
-- API Gateway, Auth, User, Expense, Approval, Currency, OCR (Python), Notification, Queue- **Approval Service** (Port 5004): Approval workflows and rules
-
+- **Expense Service** (Port 5003): Expense management, categories
+- **Approval Service** (Port 5004): Approval workflows and rules
 - **Currency Service** (Port 5005): Exchange rates, currency conversion
-
-**Tech Stack**: Node.js, TypeScript, Express, PostgreSQL, MongoDB, Redis, Python- **OCR Service** (Port 5006): Python-based receipt text extraction
-
+- **OCR Service** (Port 5006): Python-based receipt text extraction
 - **Notification Service** (Port 5007): Email and in-app notifications
+- **Queue Service**: Background job processing with pg-boss
 
-## 🚀 Quick Start- **Queue Service**: Background job processing with pg-boss
+### Tech Stack
 
+- **Backend**: Node.js, TypeScript, Express
+- **Databases**: PostgreSQL, MongoDB
+- **Caching**: Redis
+- **Queue**: pg-boss (PostgreSQL-based)
+- **OCR**: Python, Flask, Tesseract/EasyOCR
+- **Email**: Nodemailer with Gmail
+- **File Storage**: Cloudinary
+- **Authentication**: JWT with bcrypt
 
+## 🚀 Quick Start
 
-### Prerequisites### Tech Stack
+### Prerequisites
 
-```bash- **Backend**: Node.js, TypeScript, Express
-
-# Required- **Databases**: PostgreSQL (primary), MongoDB (logs, OCR, notifications)
-
-- Node.js >= 18.0.0- **Caching**: Redis
-
-- Yarn >= 1.22.0- **Queue**: pg-boss (PostgreSQL-based)
-
-- PostgreSQL >= 15- **OCR**: Python, Flask, Tesseract/EasyOCR
-
-- MongoDB >= 7- **Email**: Nodemailer with Gmail
-
-- Python >= 3.9 (for OCR)- **File Storage**: Cloudinary
-
-```- **Authentication**: JWT with bcrypt
-
-
-
-### Installation## 🚀 Quick Start
-
-
-
-1. **Clone the repository**### Prerequisites
-
-   ```bash- Node.js >= 18.0.0
-
-   git clone https://github.com/JaiminPatel345/hackathon.git- PostgreSQL >= 15
-
-   cd hackathon- MongoDB >= 7
-
-   ```- Python >= 3.9
-
+- Node.js >= 18.0.0
+- Yarn >= 1.22.0
+- PostgreSQL >= 15
+- MongoDB >= 7
+- Python >= 3.9 (for OCR)
 - Redis (optional)
 
-2. **Run automated setup**
+### Installation
 
-   ```bash### Installation
-
-   chmod +x scripts/setup.sh
-
-   ./scripts/setup.sh```bash
-
-   ```# Run setup script
-
-./setup.sh
-
-3. **Configure environment variables**
-
-   ```bash# Or manually
-
-   # Update .env files in each service directoryyarn install:all
-
-   # See docs/SETUP.md for details```
-
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/JaiminPatel345/hackathon.git
+   cd hackathon
    ```
 
-### Configuration
-
-4. **Start services**
-
-   ```bashCopy `.env.example` to `.env` in each service directory and update with your credentials.
-
-   # Using Docker
-
-   yarn docker:up### Database Setup
-
+2. **Run automated setup**
+   ```bash
+   chmod +x scripts/setup.sh
+   ./scripts/setup.sh
    
+   # Or manually
+   yarn install:all
+   ```
 
-   # Or individually```bash
+3. **Configure environment variables**
+   
+   Copy `.env.example` to `.env` in each service directory and update with your credentials.
 
-   yarn dev:gateway# PostgreSQL migrations
+4. **Database Setup**
+   ```bash
+   # PostgreSQL migrations
+   cat database/postgres/migrations/*.sql | psql -d expense_management
+   
+   # Seed categories
+   psql -d expense_management -f database/postgres/seeds/categories.sql
+   
+   # MongoDB collections
+   mongosh expense_management database/mongodb/collections/*.js
+   mongosh expense_management database/mongodb/indexes/*.js
+   ```
 
-   yarn dev:authcat database/postgres/migrations/*.sql | psql -d expense_management
+5. **Run Services**
 
-   # ... other services
+   #### Using Docker Compose (Recommended)
+   ```bash
+   docker-compose up -d
+   ```
 
-   ```# Seed categories
+   #### Manual Start (Development)
+   ```bash
+   yarn dev:gateway   # Terminal 1
+   yarn dev:auth      # Terminal 2
+   yarn dev:user      # Terminal 3
+   yarn dev:expense   # Terminal 4
+   yarn dev:approval  # Terminal 5
+   yarn dev:currency  # Terminal 6
+   yarn dev:notification # Terminal 7
+   yarn dev:queue     # Terminal 8
+   ```
 
-psql -d expense_management -f database/postgres/seeds/categories.sql
-
-5. **Test the API**
-
-   ```bash# MongoDB collections
-
-   curl http://localhost:5000/healthmongosh expense_management database/mongodb/collections/*.js
-
-   ```mongosh expense_management database/mongodb/indexes/*.js
-
-```
+6. **Verify Installation**
+   ```bash
+   curl http://localhost:5000/health
+   ```
 
 ## 📚 Documentation
 
-### Run Services
-
 Comprehensive documentation is available in the [`docs/`](./docs) folder:
 
-#### Using Docker Compose (Recommended)
-
-| Document | Description |```bash
-
-|----------|-------------|docker-compose up -d
-
-| 📖 [Full Documentation](./docs/FULL_DOCUMENTATION.md) | Complete system overview and architecture |```
-
+| Document | Description |
+|----------|-------------|
+| 📖 [Full Documentation](./docs/FULL_DOCUMENTATION.md) | Complete system overview and architecture |
 | ⚙️ [Setup Guide](./docs/SETUP.md) | Detailed installation and configuration |
+| ⚡ [Quick Reference](./docs/QUICK_REFERENCE.md) | Common commands and API examples |
+| � [Project Status](./docs/PROJECT_STATUS.md) | Implementation status and roadmap |
+| �📦 [Yarn Migration](./docs/YARN_MIGRATION.md) | Package manager migration guide |
+| 🔧 [Backend API Docs](./server/README.md) | Service-specific API documentation |
 
-| ⚡ [Quick Reference](./docs/QUICK_REFERENCE.md) | Common commands and API examples |#### Manual Start (Development)
+Additional documentation:
+- **[SETUP.md](./SETUP.md)**: Detailed setup instructions
+- **[FLOW.md](./FLOW.md)**: Complete technical specifications
 
-| 📊 [Project Status](./docs/PROJECT_STATUS.md) | Implementation status and roadmap |```bash
+## 🛠️ Available Scripts
 
-| 📦 [Yarn Migration](./docs/YARN_MIGRATION.md) | Package manager migration guide |yarn dev:gateway   # Terminal 1
+Scripts are located in the [`scripts/`](./scripts) folder:
 
-| 🔧 [Backend API Docs](./server/README.md) | Service-specific API documentation |yarn dev:auth      # Terminal 2
-
-yarn dev:user      # Terminal 3
-
-## 🛠️ Available Scriptsyarn dev:expense   # Terminal 4
-
-yarn dev:approval  # Terminal 5
-
-Scripts are located in the [`scripts/`](./scripts) folder:yarn dev:currency  # Terminal 6
-
-yarn dev:notification # Terminal 7
-
-```bashyarn dev:queue     # Terminal 8
-
-# Setup```
-
+```bash
+# Setup
 ./scripts/setup.sh              # Automated project setup
 
-### Verify Installation
-
-# Development```bash
-
-yarn install:all                # Install all dependenciescurl http://localhost:5000/health
-
-yarn dev:gateway               # Start API Gateway```
-
+# Development
+yarn install:all                # Install all dependencies
+yarn dev:gateway               # Start API Gateway
 yarn dev:auth                  # Start Auth Service
+# ... (see docs/QUICK_REFERENCE.md for all)
 
-# ... (see docs/QUICK_REFERENCE.md for all)## 📚 Documentation
-
-
-
-# Type Checking- **[SETUP.md](./SETUP.md)**: Detailed setup instructions
-
-yarn check:build               # Check TypeScript compilation- **[FLOW.md](./FLOW.md)**: Complete technical specifications
-
-./scripts/check-build.sh       # Alternative type check- **[server/README.md](./server/README.md)**: Backend API documentation
-
+# Type Checking
+yarn check:build               # Check TypeScript compilation
+./scripts/check-build.sh       # Alternative type check
 ./scripts/check-typescript.sh  # Runtime type check
 
-## 🎯 API Endpoints
-
 # Docker
-
-yarn docker:up                 # Start all servicesAll endpoints are accessible through the API Gateway at `http://localhost:5000/api`
-
+yarn docker:up                 # Start all services
 yarn docker:down               # Stop all services
+yarn docker:logs               # View logs
 
-yarn docker:logs               # View logs### Authentication
-
-- `POST /auth/signup` - Create admin account
-
-# Database- `POST /auth/signin` - User login
-
-yarn db:migrate                # Run PostgreSQL migrations- `POST /auth/forgot-password` - Request password reset
-
-yarn db:seed                   # Seed initial data- `POST /auth/reset-password` - Reset password
-
+# Database
+yarn db:migrate                # Run PostgreSQL migrations
+yarn db:seed                   # Seed initial data
 yarn mongo:setup               # Setup MongoDB collections
+```
 
-```### Users
+## 📁 Project Structure
 
-- `GET /users` - List all users (Admin)
-
-## 📁 Project Structure- `POST /users` - Create user (Admin)
-
-- `PUT /users/:id` - Update user
-
-```- `POST /users/:id/manager` - Assign manager
-
+```
 hackathon/
-
-├── client/                    # Frontend (to be implemented)### Expenses
-
-├── server/                    # Backend microservices- `GET /expenses` - List expenses (filtered by role)
-
-│   ├── shared/               # Shared types, utils, middleware- `POST /expenses` - Create expense
-
-│   ├── api-gateway/          # API Gateway (Port 5000)- `PUT /expenses/:id` - Update expense
-
-│   ├── auth-service/         # Authentication (Port 5001)- `POST /expenses/:id/submit` - Submit for approval
-
+├── client/                    # Frontend (to be implemented)
+├── server/                    # Backend microservices
+│   ├── shared/               # Shared types, utils, middleware
+│   ├── api-gateway/          # API Gateway (Port 5000)
+│   ├── auth-service/         # Authentication (Port 5001)
 │   ├── user-service/         # User Management (Port 5002)
-
-│   ├── expense-service/      # Expense Management (Port 5003)### Approvals
-
-│   ├── approval-service/     # Approval Workflows (Port 5004)- `GET /approval-rules` - List approval rules
-
-│   ├── currency-service/     # Currency Exchange (Port 5005)- `POST /approval-rules` - Create rule (Admin)
-
-│   ├── ocr-service/          # OCR Processing (Port 5006)- `GET /approvals/pending` - Pending approvals
+│   ├── expense-service/      # Expense Management (Port 5003)
+│   ├── approval-service/     # Approval Workflows (Port 5004)
+│   ├── currency-service/     # Currency Exchange (Port 5005)
+│   ├── ocr-service/          # OCR Processing (Port 5006)
 
 │   ├── notification-service/ # Notifications (Port 5007)- `POST /approvals/:id/approve` - Approve expense
 
 │   └── queue-service/        # Background Jobs- `POST /approvals/:id/reject` - Reject expense
 
+│   ├── currency-service/     # Currency Exchange (Port 5005)
+│   ├── ocr-service/          # OCR Processing (Port 5006)
+│   ├── notification-service/ # Notifications (Port 5007)
+│   └── queue-service/        # Background Jobs
 ├── database/                  # Database schemas and migrations
-
-│   ├── postgres/             # PostgreSQL migrations & seeds### Currency
-
-│   └── mongodb/              # MongoDB collections & indexes- `GET /currency/countries` - List countries with currencies
-
-├── scripts/                   # Utility scripts- `POST /currency/convert` - Convert between currencies
-
+│   ├── postgres/             # PostgreSQL migrations & seeds
+│   └── mongodb/              # MongoDB collections & indexes
+├── scripts/                   # Utility scripts
 │   ├── setup.sh              # Automated setup
-
-│   ├── check-build.sh        # Type checkingSee [server/README.md](./server/README.md) for complete API documentation.
-
+│   ├── check-build.sh        # Type checking
 │   └── check-typescript.sh   # Runtime check
-
-├── docs/                      # Documentation## 📊 Database Schema
-
+├── docs/                      # Documentation
 │   ├── FULL_DOCUMENTATION.md # Complete docs
-
-│   ├── SETUP.md              # Setup guide### PostgreSQL Tables
-
-│   ├── QUICK_REFERENCE.md    # Quick reference- companies, users, manager_relationships
-
-│   └── PROJECT_STATUS.md     # Status tracking- expense_categories, expenses, expense_line_items  
-
-├── docker-compose.yml         # Docker orchestration- approval_rules, approval_steps, expense_approvals, approval_actions
-
-└── package.json              # Workspace configuration- exchange_rates
-
+│   ├── SETUP.md              # Setup guide
+│   ├── QUICK_REFERENCE.md    # Quick reference
+│   └── PROJECT_STATUS.md     # Status tracking
+├── docker-compose.yml         # Docker orchestration
+└── package.json              # Workspace configuration
 ```
+
+## 🎯 API Endpoints
+
+All requests go through the API Gateway at `http://localhost:5000/api`
+
+### Authentication
+
+- `POST /auth/signup` - Create new company & admin user
+- `POST /auth/signin` - Login with credentials
+- `POST /auth/change-password` - Change password
+- `POST /auth/forgot-password` - Request password reset
+- `POST /auth/reset-password` - Reset password with token
+
+### Users
+
+- `GET /users` - List all users (admin/manager)
+- `POST /users` - Create new user
+- `GET /users/:id` - Get user details
+- `PUT /users/:id` - Update user
+- `DELETE /users/:id` - Delete user
+- `POST /users/:id/manager` - Assign manager
+
+### Expenses
+
+- `GET /expenses` - List expenses (filtered by role)
+- `POST /expenses` - Create expense
+- `PUT /expenses/:id` - Update expense
+- `POST /expenses/:id/submit` - Submit for approval
+
+### Approvals
+
+- `GET /approval-rules` - List approval rules
+- `POST /approval-rules` - Create rule (Admin)
+- `GET /approvals/pending` - Pending approvals
+- `POST /approvals/:id/approve` - Approve expense
+- `POST /approvals/:id/reject` - Reject expense
+
+### Currency
+
+- `GET /currency/countries` - List countries with currencies
+- `POST /currency/convert` - Convert between currencies
+
+See [server/README.md](./server/README.md) for complete API documentation.
+
+## 📊 Database Schema
+
+### PostgreSQL Tables
+
+- companies, users, manager_relationships
+- expense_categories, expenses, expense_line_items  
+- approval_rules, approval_steps, expense_approvals, approval_actions
+- exchange_rates
 
 ### MongoDB Collections
 
-## 🔌 API Endpoints- audit_logs - Complete audit trail
-
+- audit_logs - Complete audit trail
 - ocr_results - Receipt OCR processing results
+- notifications - User notifications
 
-All requests go through the API Gateway at `http://localhost:5000`- notifications - User notifications
+## 🔐 Environment Variables
 
+Key variables required:
 
+```env
+# Authentication
+JWT_SECRET=your_strong_secret_key
 
-### Authentication## 🔐 Environment Variables
-
-```bash
-
-POST /api/auth/signup          # Create new company & admin userKey variables required:
-
-POST /api/auth/signin          # Login with credentials
-
-POST /api/auth/forgot-password # Request password reset```env
-
-POST /api/auth/reset-password  # Reset password with token# Authentication
-
-```JWT_SECRET=your_strong_secret_key
-
-
-
-### Users# Databases
-
-```bashPOSTGRES_HOST=localhost
-
-GET    /api/users              # List all users (admin/manager)POSTGRES_DB=expense_management
-
-POST   /api/users              # Create new userPOSTGRES_USER=postgres
-
-GET    /api/users/:id          # Get user detailsPOSTGRES_PASSWORD=your_password
-
-PUT    /api/users/:id          # Update userMONGODB_URI=mongodb://localhost:27017/expense_management
-
-DELETE /api/users/:id          # Delete user
-
-```# Email
+# Databases
+POSTGRES_HOST=localhost
+POSTGRES_DB=expense_management
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=your_password
+MONGODB_URI=mongodb://localhost:27017/expense_management
 
 GMAIL_USER=your_email@gmail.com
+GMAIL_APP_PASSWORD=your_app_password
 
-### ExpensesGMAIL_APP_PASSWORD=your_app_password
+# File Storage
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
 
-```bash
-
-GET    /api/expenses           # List expenses# File Storage
-
-POST   /api/expenses           # Create expenseCLOUDINARY_CLOUD_NAME=your_cloud_name
-
-GET    /api/expenses/:id       # Get expense detailsCLOUDINARY_API_KEY=your_api_key
-
-PUT    /api/expenses/:id       # Update expenseCLOUDINARY_API_SECRET=your_api_secret
-
-DELETE /api/expenses/:id       # Delete expense
-
-POST   /api/expenses/:id/submit # Submit for approval# Frontend
-
-```FRONTEND_URL=http://localhost:3000
-
+# Frontend
+FRONTEND_URL=http://localhost:3000
 ```
 
-See [docs/FULL_DOCUMENTATION.md](./docs/FULL_DOCUMENTATION.md) for complete API reference.
-
-## 🧪 Testing
-
-## 🧪 Testing
-
-```bash
-
-```bash# Run tests
-
-# Run tests for all servicesyarn test
-
-yarn test
-
-# Test specific service
-
-# Run tests for a specific servicecd server/auth-service && yarn test
-
-cd server/auth-service && yarn test```
-
-```
-
-## 🛠️ Development
-
-## 🤝 Contributing
-
-### Code Structure
-
-1. Fork the repository```
-
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)hackathon/
-
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)├── server/
-
-4. Push to the branch (`git push origin feature/amazing-feature`)│   ├── shared/          # Shared types, utils, middleware
-
-5. Open a Pull Request│   ├── api-gateway/     # API Gateway service
-
-│   ├── auth-service/    # Authentication service
-
-## 📝 License│   ├── user-service/    # User management
-
-│   ├── expense-service/ # Expense management
-
-This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.│   ├── approval-service/# Approval workflows
-
-│   ├── currency-service/# Currency conversion
-
-## 👨‍💻 Author│   ├── ocr-service/     # OCR processing (Python)
-
-│   ├── notification-service/ # Notifications
-
-**Jaimin Patel**│   └── queue-service/   # Background jobs
-
-- GitHub: [@JaiminPatel345](https://github.com/JaiminPatel345)├── database/
-
-│   ├── postgres/        # SQL migrations & seeds
-
-## 🙏 Acknowledgments│   └── mongodb/         # MongoDB collections & indexes
-
-├── client/              # Frontend (React - to be added)
-
-- Built with modern microservices architecture└── docs/               # Additional documentation
-
-- Uses industry-standard tools and best practices```
-
-- Designed for scalability and maintainability
-
-### Adding a New Service
-
----
-
-1. Create service directory in `server/`
-
-**Need Help?** Check the [Setup Guide](./docs/SETUP.md) or [Quick Reference](./docs/QUICK_REFERENCE.md)2. Copy `package.json` and `tsconfig.json` from existing service
-
-3. Create `src/` with `app.ts` and `server.ts`
-4. Add service to `docker-compose.yml`
-5. Add proxy route in API Gateway
-6. Update root `package.json` workspaces
-
-## 📦 Deployment
+## � Deployment
 
 ### Docker Deployment
+
 ```bash
 # Build images
 docker-compose build
@@ -453,16 +297,8 @@ docker-compose up -d
 docker-compose logs -f
 ```
 
-### Production Checklist
-- [ ] Set strong JWT_SECRET
-- [ ] Configure production database credentials
-- [ ] Enable SSL/TLS
-- [ ] Configure CORS for production domain
-- [ ] Set up monitoring and logging
-- [ ] Configure backup strategy
-- [ ] Set up CI/CD pipeline
 
-## 🤝 Contributing
+## 🤝 Contributing (After hackathon)
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
@@ -485,14 +321,12 @@ For issues and questions:
 
 - [x] Core microservices architecture
 - [x] Authentication and authorization
-- [x] Expense management with OCR
+- [ ] Expense management with OCR
 - [x] Multi-currency support
 - [x] Approval workflows
-- [ ] Frontend application (React)
+- [x] Frontend application (React)
 - [ ] WebSocket for real-time updates
 - [ ] Advanced reporting and analytics
-- [ ] Mobile app
-- [ ] Integration with accounting software
 
 ---
 
