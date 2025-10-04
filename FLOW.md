@@ -1,4 +1,346 @@
-# Expense Management System - Implementation Prompt
+### E2E Tests
+- Test complete user journeys
+- Test approval workflows with different rules
+- Test OCR processing and auto-fill
+- Test currency conversion flows
+
+### Manual Testing Checklist
+- All user roles (Admin, Manager, Employee)
+- All approval rule types
+- File upload and OCR accuracy
+- Email delivery
+- Mobile responsiveness
+- Cross-browser compatibility
+- Error scenarios and edge cases
+
+---
+
+## Performance Optimization
+
+### Database Optimization
+- Create proper indexes on frequently queried columns
+- Use connection pooling
+- Implement query result caching for static data
+- Use database views for complex joins
+- Optimize N+1 queries with proper eager loading
+
+### API Optimization
+- Implement pagination for list endpoints
+- Use field selection to return only needed data
+- Cache frequently accessed data in Redis
+- Compress responses with gzip
+- Use HTTP/2 if possible
+
+### Frontend Optimization
+- Lazy load routes and components
+- Implement virtual scrolling for long lists
+- Optimize images (use WebP format, proper sizing)
+- Code splitting for smaller bundle sizes
+- Debounce search inputs
+- Cache API responses in memory
+- Use React.memo for expensive components
+- Implement optimistic UI updates
+
+### File Upload Optimization
+- Client-side image compression before upload
+- Upload directly to Cloudinary (not through backend)
+- Show upload progress
+- Support multiple file uploads
+- Implement retry on failure
+
+---
+
+## Deployment Considerations
+
+### Environment Variables
+Each service needs proper environment configuration for:
+- Database connections
+- API keys and secrets
+- Service URLs
+- CORS origins
+- Email credentials
+- File storage credentials
+
+### Database Migrations
+- Use migration scripts for schema changes
+- Version control all migrations
+- Test migrations in staging before production
+- Implement rollback procedures
+- Seed data for testing
+
+### Service Health Checks
+Implement health check endpoints for each service:
+- GET /health: Returns service status
+- Check database connectivity
+- Check external API availability
+- Return detailed status for debugging
+
+### Logging Strategy
+- Use structured logging (JSON format)
+- Log levels: ERROR, WARN, INFO, DEBUG
+- Include request IDs for tracing
+- Log all authentication attempts
+- Log all state changes (expense submissions, approvals)
+- Aggregate logs centrally for analysis
+
+### Monitoring
+- Track API response times
+- Monitor database query performance
+- Track queue job processing times
+- Monitor error rates
+- Set up alerts for critical issues
+- Track user activity metrics
+
+### Backup Strategy
+- Daily automated backups of PostgreSQL
+- Backup MongoDB collections
+- Store backups in separate location
+- Test restore procedures regularly
+- Document backup/restore process
+
+---
+
+## Error Handling Patterns
+
+### API Error Responses
+Standardized error response format:
+- Status code (400, 401, 403, 404, 500)
+- Error message (user-friendly)
+- Error code (for programmatic handling)
+- Field errors (for validation)
+- Request ID (for debugging)
+- Timestamp
+
+### Frontend Error Display
+- Show toast notifications for general errors
+- Inline validation errors on forms
+- Error boundaries for component crashes
+- Retry buttons for network failures
+- Helpful error messages with next steps
+- Support contact information for critical errors
+
+### Graceful Degradation
+- If OCR fails, allow manual entry
+- If currency API fails, use cached rates
+- If email fails, queue for retry
+- If notification fails, show in-app only
+- Provide fallback UI when features unavailable
+
+---
+
+## Documentation Requirements
+
+### API Documentation
+- OpenAPI/Swagger specification for all endpoints
+- Request/response examples
+- Authentication requirements
+- Error codes and meanings
+- Rate limits and pagination
+- Webhook documentation (if applicable)
+
+### Database Documentation
+- ER diagrams showing relationships
+- Table descriptions and purpose
+- Column descriptions and constraints
+- Index documentation
+- Migration history
+
+### Deployment Documentation
+- Environment setup instructions
+- Service deployment steps
+- Configuration requirements
+- Troubleshooting guide
+- Monitoring and alerting setup
+
+### User Documentation
+- User guides for each role
+- Feature tutorials with screenshots
+- FAQ section
+- Video tutorials (optional)
+- Contact support information
+
+---
+
+## Future Enhancements (Not in Core)
+
+### Potential Features to Add Later
+- Budget tracking and limits
+- Expense policy engine
+- Mobile app (React Native)
+- Advanced reporting and analytics
+- Integration with accounting software
+- Mileage tracking with GPS
+- Receipt scanning from mobile camera
+- Multi-language support
+- Advanced audit trail with timeline
+- Expense forecasting
+- Automated recurring expenses
+- Split expenses across projects
+- Vendor management
+- Contract and invoice management
+
+---
+
+## Development Workflow
+
+### Git Workflow
+- Main branch for production-ready code
+- Develop branch for integration
+- Feature branches for new features
+- Commit message conventions
+- Pull request review process
+- CI/CD pipeline for automated testing
+
+### Code Review Checklist
+- Code follows style guide
+- All tests pass
+- No security vulnerabilities
+- Performance considerations
+- Error handling implemented
+- Documentation updated
+- No hardcoded values
+- Proper logging added
+
+### Release Process
+1. Create release branch from develop
+2. Run full test suite
+3. Update version numbers
+4. Update changelog
+5. Deploy to staging
+6. Perform smoke tests
+7. Deploy to production
+8. Monitor for issues
+9. Tag release in git
+
+---
+
+## Quick Start Guide for AI
+
+### Implementation Priority Order
+1. **Setup infrastructure**: Databases, folders, shared types
+2. **Build auth service**: Signup, signin, password reset
+3. **Build user service**: User management, manager relationships
+4. **Build frontend auth**: Login, signup pages with country dropdown
+5. **Build expense service**: CRUD operations, categories
+6. **Integrate Cloudinary**: File upload functionality
+7. **Build frontend expenses**: List, create, edit forms
+8. **Build OCR service**: Text extraction and parsing
+9. **Integrate queue**: Job publishing and workers
+10. **Build currency service**: Rate fetching and conversion
+11. **Build approval service**: Rules, workflow execution
+12. **Build frontend approvals**: Rules config, pending approvals
+13. **Build notification service**: Email sending, templates
+14. **Add real-time updates**: Polling or WebSocket
+15. **Polish UI**: Animations, responsive design, error states
+16. **Testing**: Unit, integration, E2E tests
+17. **Documentation**: API docs, deployment guide
+18. **Performance optimization**: Caching, indexing, bundling
+
+### Critical Implementation Notes
+- All amounts must use DECIMAL type, never FLOAT (financial accuracy)
+- Always validate user's company_id matches resource being accessed (security)
+- Store both original and converted currency amounts (audit trail)
+- Use UUIDs for all primary keys (distributed system ready)
+- Implement soft deletes with is_active flags (data retention)
+- Log all state changes in audit table (compliance)
+- Use transactions for multi-step operations (data integrity)
+- Sanitize all user inputs (security)
+- Rate limit all public endpoints (DDoS protection)
+- Use connection pooling for databases (performance)
+
+### Common Pitfalls to Avoid
+- Don't expose internal IDs in URLs or responses
+- Don't trust client-side validation alone
+- Don't store sensitive data in JWT tokens
+- Don't use localStorage for tokens in production
+- Don't hardcode service URLs, use environment variables
+- Don't skip error handling in async operations
+- Don't forget to close database connections
+- Don't use synchronous operations in async code
+- Don't skip input validation on backend
+- Don't return detailed error messages to clients (security)
+
+### Data Flow Summary
+1. User uploads receipt → Cloudinary → URL stored in expense
+2. Expense created → Queue OCR job → Python service processes → MongoDB result → Update expense
+3. Expense submitted → Find approval rule → Create approval chain → Notify first approver
+4. Approver approves → Check rule type → Move to next step or complete → Notify employee
+5. Currency conversion → Check Redis → Check database → Call external API → Cache result
+
+---
+
+## Final Checklist Before Deployment
+
+### Backend Checklist
+- [ ] All services running and healthy
+- [ ] Database migrations applied
+- [ ] Environment variables configured
+- [ ] API Gateway routing correctly
+- [ ] Authentication working (signup, signin, forgot password)
+- [ ] User management CRUD working
+- [ ] Expense CRUD working
+- [ ] Receipt upload to Cloudinary working
+- [ ] OCR processing working
+- [ ] Currency conversion working
+- [ ] Approval rules configuration working
+- [ ] Approval workflow execution working
+- [ ] Email sending working
+- [ ] Queue jobs processing
+- [ ] Logging implemented
+- [ ] Error handling implemented
+- [ ] Security measures in place
+- [ ] Performance optimization done
+
+### Frontend Checklist
+- [ ] All pages rendering correctly
+- [ ] Authentication flow working
+- [ ] Protected routes implemented
+- [ ] User management UI working
+- [ ] Expense list and filters working
+- [ ] Expense form with validation working
+- [ ] Receipt upload with preview working
+- [ ] OCR auto-fill working
+- [ ] Approval rules UI working
+- [ ] Pending approvals UI working
+- [ ] Notifications working
+- [ ] Responsive design tested
+- [ ] Cross-browser compatibility tested
+- [ ] Loading states implemented
+- [ ] Error states implemented
+- [ ] Success messages implemented
+- [ ] Custom design system applied
+- [ ] Animations subtle and professional
+
+### Integration Checklist
+- [ ] Frontend connecting to API Gateway
+- [ ] Authentication tokens working
+- [ ] File uploads working end-to-end
+- [ ] OCR processing end-to-end working
+- [ ] Approval workflow end-to-end working
+- [ ] Email notifications received
+- [ ] Currency conversion accurate
+- [ ] All user roles functioning correctly
+- [ ] Data persistence working
+- [ ] Audit logs being created
+
+### Testing Checklist
+- [ ] Unit tests passing
+- [ ] Integration tests passing
+- [ ] E2E tests passing
+- [ ] Manual testing completed
+- [ ] Edge cases handled
+- [ ] Error scenarios tested
+- [ ] Performance tested under load
+- [ ] Security vulnerabilities checked
+
+---
+
+## Support and Maintenance
+
+### Monitoring Alerts
+Set up alerts for:
+- Service downtime
+- High error rates# Expense Management System - Implementation Prompt
 
 ## Project Overview
 Build a microservices-based expense management system with React.js frontend, Node.js backend services, Python OCR service, and PostgreSQL/MongoDB databases. The system handles multi-currency expenses with configurable approval workflows.
@@ -1448,26 +1790,11 @@ async function convertCurrency(amount, fromCurrency, toCurrency, date = new Date
     };
   }
   
-  // Fetch from external API
-  const response = await fetch(`https://api.exchangerate-api.com/v4/latest/${fromCurrency}`);
-  const data = await response.json();
-  const fetchedRate = data.rates[toCurrency];
-  
-  // Store in database
-  await exchangeRateModel.create({
-    base_currency: fromCurrency,
-    target_currency: toCurrency,
-    rate: fetchedRate,
-    effective_date: date
-  });
-  
-  // Cache
-  await redis.setex(cacheKey, 86400, fetchedRate.toString());
-  
-  return {
-    converted_amount: amount * fetchedRate,
-    exchange_rate: fetchedRate
-  };
+  // Fetch from external API if not in cache or database
+  // Store the fetched rate in database
+  // Cache the rate in Redis with 24-hour expiry
+  // Calculate converted amount using the rate
+  // Return both converted amount and exchange rate used
 }
 ```
 
@@ -1475,179 +1802,682 @@ async function convertCurrency(amount, fromCurrency, toCurrency, date = new Date
 
 ## Message Queue with pg-boss (PostgreSQL-based)
 
-### Setup pg-boss
-```typescript
-// shared/queue/queue.config.ts
-import PgBoss from 'pg-boss';
+### Queue Setup
+- Use pg-boss library which creates job tables in PostgreSQL
+- Configure with separate schema called 'pgboss' to keep queue tables isolated
+- Setup error handling and logging for queue operations
+- Implement start and stop functions for graceful shutdown
 
-const boss = new PgBoss({
-  host: process.env.POSTGRES_HOST,
-  database: process.env.POSTGRES_DB,
-  user: process.env.POSTGRES_USER,
-  password: process.env.POSTGRES_PASSWORD,
-  schema: 'pgboss' // Separate schema for queue tables
-});
+### Job Types Definition
+Define enum for all job types including:
+- OCR_PROCESS: For processing receipt images
+- SEND_EMAIL: For sending emails asynchronously
+- APPROVAL_NOTIFICATION: For notifying approvers
+- CURRENCY_SYNC: For daily currency rate updates
 
-boss.on('error', error => console.error('PgBoss error:', error));
+Create TypeScript interfaces for each job's payload structure with all required fields
 
-export async function startQueue() {
-  await boss.start();
-  console.log('PgBoss queue started');
-}
-
-export async function stopQueue() {
-  await boss.stop();
-  console.log('PgBoss queue stopped');
-}
-
-export default boss;
-```
-
-### Define Job Types
-```typescript
-// shared/types/queue.types.ts
-export enum JobType {
-  OCR_PROCESS = 'ocr-process',
-  SEND_EMAIL = 'send-email',
-  APPROVAL_NOTIFICATION = 'approval-notification',
-  CURRENCY_SYNC = 'currency-sync',
-}
-
-export interface OCRProcessJob {
-  expenseId: string;
-  receiptUrl: string;
-  companyId: string;
-  userId: string;
-}
-
-export interface SendEmailJob {
-  to: string;
-  subject: string;
-  template: string;
-  data: Record<string, any>;
-}
-
-export interface ApprovalNotificationJob {
-  expenseId: string;
-  approverId: string;
-  type: 'pending' | 'approved' | 'rejected';
-}
-```
-
-### Publish Jobs
-```typescript
-// In Expense Service (after receipt upload)
-import boss from '@/shared/queue/queue.config';
-import { JobType, OCRProcessJob } from '@/shared/types/queue.types';
-
-async function triggerOCRProcessing(expenseId: string, receiptUrl: string) {
-  const jobData: OCRProcessJob = {
-    expenseId,
-    receiptUrl,
-    companyId: req.user.companyId,
-    userId: req.user.id
-  };
-  
-  await boss.send(JobType.OCR_PROCESS, jobData, {
-    retryLimit: 3,
-    retryDelay: 60, // 1 minute
-    expireInSeconds: 3600 // 1 hour
-  });
-}
-```
+### Publishing Jobs
+- When expense service uploads receipt, publish OCR_PROCESS job to queue
+- Include retry configuration (3 retries, 1 minute delay between retries)
+- Set expiration time (1 hour) after which job should be discarded
+- Pass all necessary data in job payload (expenseId, receiptUrl, companyId, userId)
 
 ### Worker Implementation
-```typescript
-// queue-service/src/workers/ocr-processor.worker.ts
-import boss from '@/shared/queue/queue.config';
-import { JobType, OCRProcessJob } from '@/shared/types/queue.types';
-import axios from 'axios';
+Create separate worker functions for each job type:
 
-export async function startOCRWorker() {
-  await boss.work<OCRProcessJob>(
-    JobType.OCR_PROCESS,
-    { teamSize: 5, teamConcurrency: 2 },
-    async (job) => {
-      const { expenseId, receiptUrl, companyId, userId } = job.data;
-      
-      try {
-        console.log(`Processing OCR for expense: ${expenseId}`);
-        
-        // Call OCR service
-        const response = await axios.post(
-          `${process.env.OCR_SERVICE_URL}/api/ocr/process`,
-          { expenseId, receiptUrl, companyId, userId }
-        );
-        
-        console.log(`OCR completed for expense: ${expenseId}`);
-        return response.data;
-      } catch (error) {
-        console.error(`OCR failed for expense: ${expenseId}`, error);
-        throw error; // Will trigger retry
-      }
-    }
-  );
-  
-  console.log('OCR worker started');
-}
-```
+**OCR Worker:**
+- Listen for OCR_PROCESS jobs with configurable team size and concurrency
+- Download receipt image from Cloudinary URL
+- Call Python OCR service to extract text
+- Parse extracted text to identify vendor, date, amount, items
+- Store OCR results in MongoDB
+- Update expense record with extracted data
+- Handle errors and retry failed jobs
 
-```typescript
-// queue-service/src/workers/email.worker.ts
-import boss from '@/shared/queue/queue.config';
-import { JobType, SendEmailJob } from '@/shared/types/queue.types';
-import nodemailer from 'nodemailer';
+**Email Worker:**
+- Listen for SEND_EMAIL jobs
+- Load HTML template based on template name
+- Replace template variables with provided data
+- Send email using Nodemailer with Gmail SMTP
+- Log success/failure
+- Store notification record in MongoDB
+- Retry on failure
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_APP_PASSWORD
-  }
-});
-
-export async function startEmailWorker() {
-  await boss.work<SendEmailJob>(
-    JobType.SEND_EMAIL,
-    { teamSize: 3, teamConcurrency: 5 },
-    async (job) => {
-      const { to, subject, template, data } = job.data;
-      
-      try {
-        const html = renderTemplate(template, data);
-        
-        await transporter.sendMail({
-          from: process.env.GMAIL_USER,
-          to,
-          subject,
-          html
-        });
-        
-        console.log(`Email sent to: ${to}`);
-      } catch (error) {
-        console.error(`Email failed to: ${to}`, error);
-        throw error;
-      }
-    }
-  );
-  
-  console.log('Email worker started');
-}
-
-function renderTemplate(templateName: string, data: Record<string, any>): string {
-  // Load and render HTML template
-  const fs = require('fs');
-  const path = require('path');
-  const templatePath = path.join(__dirname, '../../templates', `${templateName}.html`);
-  let html = fs.readFileSync(templatePath, 'utf8');
-  
-  // Simple template replacement
-  Object.keys(data).forEach(key => {
-    html = html.replace(new RegExp(`{{${key}}}`, 'g'), data[key]);
-  });
-  
-  return html;
-}
-```
+**Approval Notification Worker:**
+- Listen for APPROVAL_NOTIFICATION jobs
+- Determine notification type (pending, approved, rejected)
+- Create notification record in MongoDB
+- Send email to relevant users
+- Update notification delivery status
 
 ---
+
+## Currency Conversion Detailed Flow
+
+### Daily Rate Sync Job
+- Cron job runs at 00:00 UTC every day
+- Fetch latest rates from exchangerate-api for company's base currency
+- Store all rates in exchange_rates table with effective date
+- Update Redis cache for commonly used currency pairs
+- Log sync status and any errors
+
+### Real-time Conversion
+When expense is submitted in different currency:
+1. Check if conversion rate exists in Redis cache (key format: currency:FROM:TO:DATE)
+2. If cache miss, query exchange_rates table for that date
+3. If database miss, call external API to get current rate
+4. Store fetched rate in both database and Redis cache
+5. Calculate converted amount by multiplying original amount with rate
+6. Store both original amount/currency and converted amount/rate in expense record
+7. Display converted amount to approvers in company currency
+
+### Rate History
+- Keep historical rates in database for audit trail
+- Allow viewing expense with rate used at submission time
+- Prevent rate changes from affecting already submitted expenses
+- Generate reports showing currency-wise expense breakdown
+
+---
+
+## Approval Workflow Detailed Logic
+
+### Rule Matching Algorithm
+When expense is submitted:
+1. Find all active approval rules for the company
+2. Filter rules matching expense criteria:
+   - Check if expense category matches rule's category (if specified)
+   - Check if expense amount is within rule's min/max threshold
+   - Apply rule priority (higher priority rules take precedence)
+3. Select the most specific matching rule
+4. If no rule matches, use default company-wide rule
+
+### Sequential Approval Flow
+- Create approval chain based on rule's configured steps
+- If is_manager_approver is true, insert employee's manager as Step 1
+- Add all configured approvers as subsequent steps in order
+- Create approval_actions records for all steps with status 'pending'
+- Notify first approver via email and in-app notification
+- When approver approves:
+  - Update their approval_action to 'approved' with timestamp and comments
+  - Check if more steps remain
+  - If yes, notify next approver in sequence
+  - If no more steps, mark expense as fully approved
+  - Send approval notification to employee
+  - Remove from all pending approval queues
+
+### Percentage-Based Approval Flow
+- Calculate total number of approvers in the rule
+- Track how many have approved in real-time
+- After each approval, calculate percentage: (approved_count / total_count) × 100
+- If percentage meets or exceeds required threshold:
+  - Mark expense as approved immediately
+  - Skip remaining pending approvals
+  - Notify employee of approval
+  - Cancel pending notifications to remaining approvers
+- If percentage cannot reach threshold (too many rejections), mark as rejected
+
+### Specific Approver Auto-Approve
+- Mark certain approvers (like CFO, CEO) with is_auto_approve flag
+- When expense reaches these approvers:
+  - If they approve, automatically mark entire expense as approved
+  - Skip all remaining steps in sequence
+  - Notify employee immediately
+- This gives senior stakeholders override power
+
+### Hybrid Rule Flow
+- Combine sequential with percentage OR specific approver logic
+- Example: "Expense approved if 60% approve OR CFO approves"
+- Check both conditions after each approval action:
+  - Calculate if percentage threshold met
+  - Check if any auto-approve user has approved
+  - If either condition is true, approve expense
+- Allows flexible approval paths for different scenarios
+
+### Rejection Handling
+- Single rejection can stop entire approval flow (configurable)
+- Or require majority rejection to reject expense (based on rule)
+- When rejected:
+  - Mark expense_approvals status as 'rejected'
+  - Update expense status to 'rejected'
+  - Capture rejection reason in comments
+  - Notify employee with reason
+  - Remove from all pending queues
+  - Create audit log entry
+
+---
+
+## OCR Service Implementation Details
+
+### Python Service Architecture
+- Flask API with REST endpoints
+- Use Tesseract OCR or EasyOCR for text extraction
+- Implement receipt parsing logic to structure extracted text
+- Store results in MongoDB for querying and analysis
+
+### Image Preprocessing
+Before OCR processing:
+- Download image from Cloudinary URL
+- Resize image to optimal dimensions (improves accuracy)
+- Convert to grayscale
+- Apply image enhancement (contrast, brightness adjustment)
+- Detect and correct image rotation/skew
+- Remove noise and blur
+
+### Text Extraction
+- Run OCR engine on preprocessed image
+- Extract all text with confidence scores
+- Identify text regions and their positions
+- Handle multiple languages if needed
+- Return raw text and structured data
+
+### Receipt Parsing Logic
+Analyze extracted text to identify:
+- **Vendor name**: Usually at top, largest text, may include keywords like "Restaurant", "Hotel", "Store"
+- **Date**: Look for date patterns (DD/MM/YYYY, MM-DD-YYYY, etc.)
+- **Total amount**: Search for keywords like "Total", "Amount", "Grand Total" followed by number
+- **Currency**: Identify currency symbols ($, €, ₹, £) or codes (USD, EUR, INR)
+- **Tax/GST**: Find "Tax", "GST", "VAT" with associated amount
+- **Line items**: Extract itemized list with descriptions and prices
+- **Payment method**: Look for "Cash", "Card", "Credit Card", "UPI"
+- **Receipt number**: Search for "Receipt #", "Invoice #", "Bill #"
+
+### Confidence Scoring
+- Calculate overall confidence based on how many fields were successfully extracted
+- Individual confidence scores for each field
+- If confidence is low (< 50%), flag for manual review
+- Store confidence scores for analytics and improvement
+
+### Error Handling
+- If image quality is too poor, return error with message
+- If no text detected, return empty result with low confidence
+- Handle different receipt formats (thermal, printed, handwritten)
+- Fallback to simpler extraction if complex parsing fails
+
+### Result Storage
+- Store complete OCR results in MongoDB for audit and debugging
+- Include raw text, parsed data, confidence scores, processing time
+- Link to expense record via expenseId
+- Allow reprocessing if needed
+
+---
+
+## Email Service and Templates
+
+### Nodemailer Configuration
+- Use Gmail SMTP service with app password (not regular password)
+- Configure sender name and email
+- Setup connection pooling for better performance
+- Implement retry logic for failed sends
+- Track delivery status
+
+### Email Template System
+Create HTML templates for all notification types:
+
+**Welcome Email:**
+- Sent when new company/admin signs up
+- Include company name, admin name
+- Provide quick start guide links
+- Encourage completing profile setup
+
+**Password Reset Email:**
+- Sent when user requests password reset
+- Include secure reset link with token (expires in 1 hour)
+- Clear instructions on how to reset
+- Warning about not sharing link
+
+**New User Password Setup:**
+- Sent when admin creates new employee/manager
+- Include temporary login link or credentials
+- Instructions to set permanent password
+- Welcome message
+
+**Expense Submitted:**
+- Sent to first approver when expense submitted
+- Include expense details (description, amount, date)
+- Link to approve/reject in application
+- Show employee name and receipt thumbnail
+
+**Approval Pending Reminder:**
+- Sent if approval pending for more than 3 days
+- List of pending expenses
+- One-click approve/reject links
+- Urgency indicator
+
+**Expense Approved:**
+- Sent to employee when expense fully approved
+- Show approval path (who approved and when)
+- Estimated reimbursement timeline
+- Thank you message
+
+**Expense Rejected:**
+- Sent to employee when expense rejected
+- Clear rejection reason from approver comments
+- Guidance on how to resubmit if applicable
+- Contact information for queries
+
+### Template Variables
+Each template supports dynamic variables:
+- User names (firstName, lastName)
+- Company name
+- Expense details (amount, category, date)
+- Approver information
+- Action links with tokens
+- Timestamps
+
+### Email Styling
+- Responsive HTML that works on all email clients
+- Use inline CSS (many clients strip external styles)
+- Include company branding (logo, colors)
+- Clear call-to-action buttons
+- Mobile-friendly layout
+- Plain text fallback for accessibility
+
+---
+
+## Frontend UI Components and Patterns
+
+### Custom Design System
+Create unique visual language that doesn't look like standard component libraries:
+
+**Color Usage:**
+- Primary color for main actions and highlights
+- Secondary color for supporting elements
+- Neutral grays for text and borders
+- Success green for approvals and positive states
+- Warning orange for pending/review states
+- Error red for rejections and errors
+- Use gradient combinations for headers and cards to add depth
+
+**Typography Hierarchy:**
+- Display font (Poppins) for headings and important text
+- Sans-serif font (Inter) for body text and UI elements
+- Clear size scale with proper line heights
+- Appropriate font weights (400 regular, 500 medium, 600 semibold, 700 bold)
+
+**Card Design:**
+- Rounded corners (12px) for modern feel
+- Subtle shadows that increase on hover
+- Border with light neutral color
+- Proper padding and internal spacing
+- Hover state with slight scale-up animation
+
+**Button Styles:**
+- Primary: Solid background with white text
+- Secondary: Outlined with colored text
+- Ghost: No background, colored text, hover shows background
+- Consistent height (40px for medium, 48px for large)
+- Smooth transitions on hover and click
+- Loading states with spinner
+- Disabled states with reduced opacity
+
+**Form Inputs:**
+- Clear labels above inputs
+- Placeholder text for guidance
+- Focus state with colored border and subtle glow
+- Error state with red border and error message below
+- Success state with green checkmark
+- Proper spacing between fields
+
+**Tables:**
+- Clean layout with borders between rows
+- Hover state highlights entire row
+- Sortable column headers with icons
+- Action buttons in last column
+- Responsive design that collapses to cards on mobile
+- Pagination or infinite scroll for large datasets
+
+**Modals:**
+- Backdrop with blur effect
+- Card-style content area
+- Clear header with title and close button
+- Content area with proper scrolling
+- Footer with action buttons (right-aligned)
+- Smooth entrance/exit animations
+
+### Animation Guidelines
+Use Framer Motion but make animations subtle and professional:
+
+**Page Transitions:**
+- Fade in with slight upward movement (10-20px)
+- Duration: 300-400ms
+- Easing: easeOut for natural feel
+
+**List Items:**
+- Stagger animation when rendering lists
+- Each item fades in with 50ms delay from previous
+- Subtle slide in from left
+
+**Modals:**
+- Scale from 0.95 to 1.0 while fading in
+- Backdrop fades in simultaneously
+- Exit animations reverse the entrance
+
+**Hover Effects:**
+- Scale up cards by 2% (1.02)
+- Increase shadow elevation
+- Duration: 200ms
+- Use transform for better performance
+
+**Loading States:**
+- Skeleton screens instead of spinners when possible
+- Pulse animation for loading placeholders
+- Smooth transition when content loads
+
+**Status Changes:**
+- Color transition when status updates
+- Icon scale animation to draw attention
+- Brief highlight flash to indicate change
+
+### Avoid These Animation Patterns
+- No bounce effects (looks childish)
+- No spinning/rotating elements (except loading spinners)
+- No slide-in from screen edges (dated)
+- No 3D transforms or flips
+- No confetti or celebration animations
+- Keep all animations under 500ms
+
+---
+
+## Responsive Design Strategy
+
+### Breakpoints
+- Mobile: < 640px
+- Tablet: 640px - 1024px
+- Desktop: > 1024px
+- Wide desktop: > 1440px
+
+### Mobile-First Approach
+Design for mobile first, then enhance for larger screens:
+
+**Navigation:**
+- Mobile: Bottom tab bar or hamburger menu
+- Desktop: Side navigation sidebar
+
+**Tables:**
+- Mobile: Convert to card layout
+- Each row becomes a card with vertical field layout
+- Important fields shown prominently
+- Actions in card footer
+
+**Forms:**
+- Mobile: Full-width inputs, vertical layout
+- Desktop: Multi-column layout where appropriate
+- Proper touch targets (min 44x44px)
+
+**Modals:**
+- Mobile: Full-screen overlay
+- Desktop: Centered modal with backdrop
+
+**Dashboard:**
+- Mobile: Single column, stacked cards
+- Tablet: 2-column grid
+- Desktop: 3-4 column grid with more data density
+
+---
+
+## Security Best Practices
+
+### Authentication
+- Store JWT tokens in httpOnly cookies (not localStorage for production)
+- Include CSRF tokens for state-changing operations
+- Implement token refresh mechanism
+- Set reasonable token expiry (24 hours)
+- Hash passwords with bcrypt (10 rounds minimum)
+
+### Authorization
+- Verify user role on every protected endpoint
+- Check company_id matches for all data access
+- Implement row-level security where possible
+- Don't trust client-side role checks
+
+### Input Validation
+- Validate all inputs on server side
+- Use Zod or similar for schema validation
+- Sanitize inputs to prevent SQL injection
+- Limit file upload sizes and types
+- Validate email formats, dates, amounts
+
+### File Upload Security
+- Validate file types (only images for receipts)
+- Scan for malware if possible
+- Use Cloudinary's built-in security features
+- Generate unique filenames to prevent overwrites
+- Set proper access controls on uploaded files
+
+### API Security
+- Rate limiting on all endpoints
+- CORS configuration for frontend domain only
+- Request size limits
+- Logging of all authentication attempts
+- Monitor for suspicious patterns
+
+---
+
+## Testing Strategy
+
+### Unit Tests
+- Test all service functions in isolation
+- Mock database calls
+- Test error handling and edge cases
+- Aim for 70%+ code coverage
+
+### Integration Tests
+- Test API endpoints with real database
+- Test approval workflow end-to-end
+- Test OCR processing pipeline
+- Test email sending idx_companies_country ON companies(country);
+```
+
+#### 2. Users Table
+```sql
+CREATE TABLE users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    role VARCHAR(50) NOT NULL CHECK (role IN ('admin', 'manager', 'employee')),
+    is_active BOOLEAN DEFAULT true,
+    reset_token VARCHAR(255),
+    reset_token_expiry TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_users_company_id ON users(company_id);
+CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_users_role ON users(role);
+```
+
+#### 3. Manager Relationships Table
+```sql
+CREATE TABLE manager_relationships (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    employee_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    manager_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    is_primary BOOLEAN DEFAULT true,
+    effective_from DATE NOT NULL DEFAULT CURRENT_DATE,
+    effective_to DATE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(employee_id, manager_id, effective_from)
+);
+
+CREATE INDEX idx_manager_rel_employee ON manager_relationships(employee_id);
+CREATE INDEX idx_manager_rel_manager ON manager_relationships(manager_id);
+```
+
+#### 4. Expense Categories Table
+```sql
+CREATE TABLE expense_categories (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(company_id, name)
+);
+
+CREATE INDEX idx_categories_company ON expense_categories(company_id);
+```
+
+#### 5. Expenses Table
+```sql
+CREATE TABLE expenses (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+    employee_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    category_id UUID REFERENCES expense_categories(id),
+    
+    -- Expense Details
+    description TEXT NOT NULL,
+    expense_date DATE NOT NULL,
+    
+    -- Amount Information
+    amount DECIMAL(15, 2) NOT NULL,
+    currency_code VARCHAR(3) NOT NULL,
+    converted_amount DECIMAL(15, 2),
+    exchange_rate DECIMAL(10, 6),
+    
+    -- Payment Info
+    paid_by VARCHAR(50),
+    gst_percentage DECIMAL(5, 2) DEFAULT 0,
+    
+    -- Receipt Information
+    receipt_url VARCHAR(500),
+    receipt_public_id VARCHAR(255),
+    ocr_processed BOOLEAN DEFAULT false,
+    ocr_confidence DECIMAL(5, 2),
+    
+    -- Status
+    status VARCHAR(50) NOT NULL DEFAULT 'draft' 
+        CHECK (status IN ('draft', 'submitted', 'pending_approval', 'approved', 'rejected', 'paid')),
+    submitted_at TIMESTAMP,
+    
+    -- Metadata
+    remarks TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_expenses_employee ON expenses(employee_id);
+CREATE INDEX idx_expenses_company ON expenses(company_id);
+CREATE INDEX idx_expenses_status ON expenses(status);
+CREATE INDEX idx_expenses_date ON expenses(expense_date);
+CREATE INDEX idx_expenses_category ON expenses(category_id);
+```
+
+#### 6. Expense Line Items Table
+```sql
+CREATE TABLE expense_line_items (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    expense_id UUID NOT NULL REFERENCES expenses(id) ON DELETE CASCADE,
+    description VARCHAR(255) NOT NULL,
+    amount DECIMAL(15, 2) NOT NULL,
+    quantity DECIMAL(10, 2) DEFAULT 1,
+    unit_price DECIMAL(15, 2),
+    category VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_line_items_expense ON expense_line_items(expense_id);
+```
+
+#### 7. Approval Rules Table
+```sql
+CREATE TABLE approval_rules (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    
+    -- Rule Type
+    rule_type VARCHAR(50) NOT NULL 
+        CHECK (rule_type IN ('sequential', 'percentage', 'specific_approver', 'hybrid')),
+    
+    -- Thresholds
+    min_amount DECIMAL(15, 2),
+    max_amount DECIMAL(15, 2),
+    
+    -- Conditions
+    is_manager_approver BOOLEAN DEFAULT true,
+    percentage_required DECIMAL(5, 2),
+    
+    -- Category specific
+    category_id UUID REFERENCES expense_categories(id),
+    
+    is_active BOOLEAN DEFAULT true,
+    priority INTEGER DEFAULT 0,
+    
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_approval_rules_company ON approval_rules(company_id);
+CREATE INDEX idx_approval_rules_active ON approval_rules(is_active);
+CREATE INDEX idx_approval_rules_category ON approval_rules(category_id);
+```
+
+#### 8. Approval Steps Table
+```sql
+CREATE TABLE approval_steps (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    approval_rule_id UUID NOT NULL REFERENCES approval_rules(id) ON DELETE CASCADE,
+    step_number INTEGER NOT NULL,
+    approver_role VARCHAR(50),
+    approver_id UUID REFERENCES users(id),
+    is_auto_approve BOOLEAN DEFAULT false,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(approval_rule_id, step_number)
+);
+
+CREATE INDEX idx_approval_steps_rule ON approval_steps(approval_rule_id);
+```
+
+#### 9. Expense Approvals Table
+```sql
+CREATE TABLE expense_approvals (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    expense_id UUID NOT NULL REFERENCES expenses(id) ON DELETE CASCADE,
+    approval_rule_id UUID REFERENCES approval_rules(id),
+    
+    -- Current State
+    current_step INTEGER DEFAULT 1,
+    total_steps INTEGER NOT NULL,
+    
+    status VARCHAR(50) NOT NULL DEFAULT 'pending' 
+        CHECK (status IN ('pending', 'in_progress', 'approved', 'rejected', 'escalated')),
+    
+    -- Timestamps
+    started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    completed_at TIMESTAMP
+);
+
+CREATE INDEX idx_expense_approvals_expense ON expense_approvals(expense_id);
+CREATE INDEX idx_expense_approvals_status ON expense_approvals(status);
+```
+
+#### 10. Approval Actions Table
+```sql
+CREATE TABLE approval_actions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    expense_approval_id UUID NOT NULL REFERENCES expense_approvals(id) ON DELETE CASCADE,
+    expense_id UUID NOT NULL REFERENCES expenses(id) ON DELETE CASCADE,
+    
+    -- Approver Info
+    approver_id UUID NOT NULL REFERENCES users(id),
+    step_number INTEGER NOT NULL,
+    
+    -- Action
+    action VARCHAR(50) NOT NULL CHECK (action IN ('approved', 'rejected', 'pending')),
+    comments TEXT,
+    
+    -- Timestamps
+    action_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX
