@@ -1,133 +1,147 @@
-﻿import { useCallback, useEffect, useState } from 'react';
-import { approvalsService } from '@services/approvals.service';
-import { ApprovalRule, PendingApproval } from '@types/approval.types';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  useGetApprovalRulesQuery,
+  useCreateApprovalRuleMutation,
+  useUpdateApprovalRuleMutation,
+  useDeleteApprovalRuleMutation,
+  useGetPendingApprovalsQuery,
+  useApproveExpenseMutation,
+  useRejectExpenseMutation,
+} from '@store/api/approvalsApi';
+import type { ApprovalRule, PendingApproval } from '@types/approval.types';
 import { handleApiError } from '@utils/helpers';
 import { useNotificationContext } from '@context/NotificationContext';
 
 export const useApprovalRules = (autoFetch = true) => {
-  const [rules, setRules] = useState<ApprovalRule[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const { notifyError, notifySuccess } = useNotificationContext();
 
-  const fetchRules = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await approvalsService.getApprovalRules();
-      setRules(response.data.rules ?? response.data);
-    } catch (err) {
-      const message = handleApiError(err);
-      setError(message);
-      notifyError(message);
-    } finally {
-      setLoading(false);
-    }
-  }, [notifyError]);
+  const {
+    data,
+    isFetching,
+    refetch,
+    error: queryError,
+  } = useGetApprovalRulesQuery(undefined, { skip: !autoFetch });
 
-  const saveRule = async (data: Partial<ApprovalRule>) => {
-    try {
-      setLoading(true);
-      if (data.id) {
-        await approvalsService.updateApprovalRule(data.id, data);
-        notifySuccess('Approval rule updated');
-      } else {
-        await approvalsService.createApprovalRule(data as ApprovalRule);
-        notifySuccess('Approval rule created');
-      }
-      await fetchRules();
-    } catch (err) {
-      notifyError(handleApiError(err));
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [createRuleMutation, { isLoading: isCreating }] = useCreateApprovalRuleMutation();
+  const [updateRuleMutation, { isLoading: isUpdating }] = useUpdateApprovalRuleMutation();
+  const [deleteRuleMutation, { isLoading: isDeleting }] = useDeleteApprovalRuleMutation();
 
-  const deleteRule = async (id: string) => {
-    try {
-      setLoading(true);
-      await approvalsService.deleteApprovalRule(id);
-      notifySuccess('Approval rule removed');
-      await fetchRules();
-    } catch (err) {
-      notifyError(handleApiError(err));
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (autoFetch) {
-      fetchRules();
+    if (queryError) {
+      const message = handleApiError(queryError);
+      setError(message);
+      notifyError(message);
     }
-  }, [autoFetch, fetchRules]);
+  }, [queryError, notifyError]);
+
+  const saveRule = useCallback(
+    async (payload: Partial<ApprovalRule>) => {
+      try {
+        const mutation = payload.id ? updateRuleMutation : createRuleMutation;
+        await mutation(payload as ApprovalRule).unwrap();
+        notifySuccess(payload.id ? 'Approval rule updated' : 'Approval rule created');
+        await refetch();
+      } catch (err) {
+        const message = handleApiError(err);
+        setError(message);
+        notifyError(message);
+        throw err;
+      }
+    },
+    [createRuleMutation, notifyError, notifySuccess, refetch, updateRuleMutation],
+  );
+
+  const deleteRule = useCallback(
+    async (id: string) => {
+      try {
+        await deleteRuleMutation(id).unwrap();
+        notifySuccess('Approval rule removed');
+        await refetch();
+      } catch (err) {
+        const message = handleApiError(err);
+        setError(message);
+        notifyError(message);
+        throw err;
+      }
+    },
+    [deleteRuleMutation, notifyError, notifySuccess, refetch],
+  );
+
+  const rules: ApprovalRule[] = useMemo(() => data?.rules ?? [], [data?.rules]);
 
   return {
     rules,
-    loading,
+    loading: isFetching || isCreating || isUpdating || isDeleting,
     error,
-    fetchRules,
+    fetchRules: refetch,
     saveRule,
     deleteRule,
   };
 };
 
 export const usePendingApprovals = (autoFetch = true) => {
-  const [pending, setPending] = useState<PendingApproval[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const { notifyError, notifySuccess } = useNotificationContext();
 
-  const fetchPending = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await approvalsService.getPendingApprovals();
-      setPending(response.data.pending ?? response.data);
-    } catch (err) {
-      const message = handleApiError(err);
-      setError(message);
-      notifyError(message);
-    } finally {
-      setLoading(false);
-    }
-  }, [notifyError]);
+  const {
+    data,
+    isFetching,
+    refetch,
+    error: queryError,
+  } = useGetPendingApprovalsQuery(undefined, { skip: !autoFetch });
 
-  const approve = async (approvalId: string, comments?: string) => {
-    try {
-      await approvalsService.approveExpense(approvalId, comments);
-      notifySuccess('Expense approved');
-      await fetchPending();
-    } catch (err) {
-      notifyError(handleApiError(err));
-      throw err;
-    }
-  };
-
-  const reject = async (approvalId: string, comments: string) => {
-    try {
-      await approvalsService.rejectExpense(approvalId, comments);
-      notifySuccess('Expense rejected');
-      await fetchPending();
-    } catch (err) {
-      notifyError(handleApiError(err));
-      throw err;
-    }
-  };
+  const [approveMutation, { isLoading: isApproving }] = useApproveExpenseMutation();
+  const [rejectMutation, { isLoading: isRejecting }] = useRejectExpenseMutation();
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (autoFetch) {
-      fetchPending();
+    if (queryError) {
+      const message = handleApiError(queryError);
+      setError(message);
+      notifyError(message);
     }
-  }, [autoFetch, fetchPending]);
+  }, [notifyError, queryError]);
+
+  const approve = useCallback(
+    async (approvalId: string, comments?: string) => {
+      try {
+        await approveMutation({ approvalId, comments }).unwrap();
+        notifySuccess('Expense approved');
+        await refetch();
+      } catch (err) {
+        const message = handleApiError(err);
+        setError(message);
+        notifyError(message);
+        throw err;
+      }
+    },
+    [approveMutation, notifyError, notifySuccess, refetch],
+  );
+
+  const reject = useCallback(
+    async (approvalId: string, comments: string) => {
+      try {
+        await rejectMutation({ approvalId, comments }).unwrap();
+        notifySuccess('Expense rejected');
+        await refetch();
+      } catch (err) {
+        const message = handleApiError(err);
+        setError(message);
+        notifyError(message);
+        throw err;
+      }
+    },
+    [notifyError, notifySuccess, refetch, rejectMutation],
+  );
+
+  const pending: PendingApproval[] = useMemo(() => data?.pending ?? [], [data?.pending]);
 
   return {
     pending,
-    loading,
+    loading: isFetching || isApproving || isRejecting,
     error,
-    fetchPending,
+    fetchPending: refetch,
     approve,
     reject,
   };

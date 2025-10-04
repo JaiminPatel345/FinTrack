@@ -1,45 +1,39 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { expensesService } from '@services/expenses.service';
-import { Expense } from '@types/expense.types';
 import { Card } from '@components/common/Card';
 import { Button } from '@components/common/Button';
-import { formatCurrency, formatDate, formatStatus } from '@utils/formatters';
 import { Badge } from '@components/common/Badge';
 import { StatusTimeline } from '@components/expenses/StatusTimeline';
+import { formatCurrency, formatDate, formatStatus } from '@utils/formatters';
+import { useGetExpenseQuery } from '@store/api/expensesApi';
 
 export const ExpenseDetails: React.FC = () => {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [expense, setExpense] = useState<Expense | null>(null);
 
-  useEffect(() => {
-    const load = async () => {
-      if (!id) return;
-      const response = await expensesService.getExpense(id);
-      setExpense(response.data.expense ?? response.data);
-    };
-    load();
-  }, [id]);
+  const { data: expense, isFetching } = useGetExpenseQuery(id!, { skip: !id });
 
-  if (!expense) {
+  const steps = useMemo(() => {
+    if (!expense) return [];
+    return [
+      {
+        title: 'Draft created',
+        description: expense.userName,
+        status: 'completed' as const,
+        timestamp: formatDate(expense.createdAt),
+      },
+      {
+        title: formatStatus(expense.status),
+        description: expense.remarks,
+        status: expense.status === 'approved' ? 'completed' : expense.status === 'rejected' ? 'rejected' : 'current',
+        timestamp: expense.submittedAt ? formatDate(expense.submittedAt) : undefined,
+      },
+    ];
+  }, [expense]);
+
+  if (!expense || isFetching) {
     return <p>Loading expense...</p>;
   }
-
-  const steps = [
-    {
-      title: 'Draft created',
-      description: expense.userName,
-      status: 'completed' as const,
-      timestamp: formatDate(expense.createdAt),
-    },
-    {
-      title: formatStatus(expense.status),
-      description: expense.remarks,
-      status: expense.status === 'approved' ? 'completed' : expense.status === 'rejected' ? 'rejected' : 'current',
-      timestamp: expense.submittedAt ? formatDate(expense.submittedAt) : undefined,
-    },
-  ];
 
   return (
     <div className="space-y-6">
@@ -58,7 +52,7 @@ export const ExpenseDetails: React.FC = () => {
           <div>
             <h2 className="text-xl font-semibold text-neutral-900">{expense.description}</h2>
             <p className="text-sm text-neutral-500">
-              {expense.categoryName} · {formatDate(expense.expenseDate)}
+              {expense.categoryName} � {formatDate(expense.expenseDate)}
             </p>
             <div className="mt-3 flex items-center gap-2">
               <Badge variant="info">{formatStatus(expense.status)}</Badge>

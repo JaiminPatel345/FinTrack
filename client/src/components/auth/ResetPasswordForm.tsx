@@ -1,11 +1,12 @@
-﻿import React from 'react';
+import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { resetPasswordSchema, ResetPasswordSchema } from '@utils/validators';
 import { Input } from '@components/common/Input';
 import { Button } from '@components/common/Button';
-import { authService } from '@services/auth.service';
 import { useNotificationContext } from '@context/NotificationContext';
+import { useResetPasswordMutation } from '@store/api/authApi';
+import { handleApiError } from '@utils/helpers';
 
 interface ResetPasswordFormProps {
   token: string;
@@ -13,10 +14,12 @@ interface ResetPasswordFormProps {
 
 export const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ token }) => {
   const { notifySuccess, notifyError } = useNotificationContext();
+  const [resetPasswordMutation, { isLoading }] = useResetPasswordMutation();
+
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
     reset,
   } = useForm<ResetPasswordSchema>({
     resolver: zodResolver(resetPasswordSchema),
@@ -24,11 +27,11 @@ export const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ token }) =
 
   const onSubmit = async (data: ResetPasswordSchema) => {
     try {
-      await authService.resetPassword(token, data);
+      await resetPasswordMutation({ token, ...data }).unwrap();
       notifySuccess('Your password has been updated. You can now sign in.');
       reset();
     } catch (err) {
-      notifyError('Failed to reset password. Please request a new link.');
+      notifyError(handleApiError(err));
     }
   };
 
@@ -48,7 +51,7 @@ export const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ token }) =
         error={errors.confirmPassword?.message}
         {...register('confirmPassword')}
       />
-      <Button type="submit" className="w-full" loading={isSubmitting}>
+      <Button type="submit" className="w-full" loading={isLoading}>
         Reset Password
       </Button>
     </form>

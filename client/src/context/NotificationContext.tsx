@@ -1,60 +1,105 @@
-﻿import React, { createContext, useCallback, useContext, useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Toaster, toast, ToastOptions } from 'react-hot-toast';
+import { nanoid } from '@reduxjs/toolkit';
+import { useAppDispatch, useAppSelector } from '@store/hooks';
+import {
+  enqueueNotification,
+  removeNotification,
+  selectNotificationsQueue,
+  NotificationTone,
+} from '@store/slices/notificationsSlice';
 
-interface NotificationContextValue {
-  notify: (message: string, options?: ToastOptions) => string;
-  notifySuccess: (message: string, options?: ToastOptions) => string;
-  notifyError: (message: string, options?: ToastOptions) => string;
-  dismiss: (toastId?: string) => void;
-}
+const NotificationListener: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const queue = useAppSelector(selectNotificationsQueue);
 
-const NotificationContext = createContext<NotificationContextValue | null>(null);
+  React.useEffect(() => {
+    queue.forEach(({ id, message, tone, options }) => {
+      const toastOptions: ToastOptions = { id, ...options };
+
+      switch (tone) {
+        case 'success': {
+          toast.success(message, toastOptions);
+          break;
+        }
+        case 'error': {
+          toast.error(message, toastOptions);
+          break;
+        }
+        case 'warning': {
+          toast(message, {
+            icon: '??',
+            ...toastOptions,
+          });
+          break;
+        }
+        default: {
+          toast(message, toastOptions);
+        }
+      }
+
+      dispatch(removeNotification(id));
+    });
+  }, [queue, dispatch]);
+
+  return null;
+};
 
 export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const notify = useCallback((message: string, options?: ToastOptions) => toast(message, options), []);
+  return (
+    <>
+      <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
+      <NotificationListener />
+      {children}
+    </>
+  );
+};
+
+const dispatchNotification = (
+  dispatch: ReturnType<typeof useAppDispatch>,
+  tone: NotificationTone,
+  message: string,
+  options?: ToastOptions,
+) => {
+  const id = nanoid();
+  dispatch(
+    enqueueNotification({
+      id,
+      tone,
+      message,
+      options,
+    }),
+  );
+  return id;
+};
+
+export const useNotificationContext = () => {
+  const dispatch = useAppDispatch();
+
+  const notify = useCallback(
+    (message: string, options?: ToastOptions) => dispatchNotification(dispatch, 'default', message, options),
+    [dispatch],
+  );
 
   const notifySuccess = useCallback(
-    (message: string, options?: ToastOptions) =>
-      toast.success(message, {
-        duration: 4000,
-        ...options,
-      }),
-    []
+    (message: string, options?: ToastOptions) => dispatchNotification(dispatch, 'success', message, options),
+    [dispatch],
   );
 
   const notifyError = useCallback(
-    (message: string, options?: ToastOptions) =>
-      toast.error(message, {
-        duration: 5000,
-        ...options,
-      }),
-    []
+    (message: string, options?: ToastOptions) => dispatchNotification(dispatch, 'error', message, options),
+    [dispatch],
   );
 
   const dismiss = useCallback((toastId?: string) => toast.dismiss(toastId), []);
 
-  const value = useMemo(
+  return useMemo(
     () => ({
       notify,
       notifySuccess,
       notifyError,
       dismiss,
     }),
-    [notify, notifySuccess, notifyError, dismiss]
+    [dismiss, notify, notifyError, notifySuccess],
   );
-
-  return (
-    <NotificationContext.Provider value={value}>
-      <Toaster position="top-right" />
-      {children}
-    </NotificationContext.Provider>
-  );
-};
-
-export const useNotificationContext = () => {
-  const context = useContext(NotificationContext);
-  if (!context) {
-    throw new Error('useNotificationContext must be used within NotificationProvider');
-  }
-  return context;
 };

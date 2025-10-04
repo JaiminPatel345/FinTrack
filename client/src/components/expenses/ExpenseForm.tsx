@@ -1,4 +1,4 @@
-﻿import React, { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { expenseSchema, ExpenseSchema } from '@utils/validators';
@@ -15,6 +15,7 @@ interface ExpenseFormProps {
   onSubmit: (data: ExpenseFormData) => Promise<void> | void;
   submitting?: boolean;
   onReceiptSelected?: (file: File) => Promise<{ url: string; publicId: string }>;
+  loadingCategories?: boolean;
 }
 
 export const ExpenseForm: React.FC<ExpenseFormProps> = ({
@@ -23,6 +24,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({
   onSubmit,
   submitting = false,
   onReceiptSelected,
+  loadingCategories = false,
 }) => {
   const {
     register,
@@ -105,8 +107,8 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <Select label="Category" error={errors.categoryId?.message} {...register('categoryId')}>
-          <option value="">Select category</option>
+        <Select label="Category" error={errors.categoryId?.message} disabled={loadingCategories} {...register('categoryId')}>
+          <option value="">{loadingCategories ? 'Loading categories...' : 'Select category'}</option>
           {categories.map((category) => (
             <option key={category.id} value={category.id}>
               {category.name}

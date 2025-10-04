@@ -1,53 +1,38 @@
-﻿import { useEffect, useState } from 'react';
-import { currencyService } from '@services/currency.service';
-import { Country, CurrencyConversionRequest, CurrencyConversionResponse } from '@types/currency.types';
+import { useCallback } from 'react';
+import {
+  useGetCountriesQuery,
+  useConvertCurrencyMutation,
+} from '@store/api/currencyApi';
+import type { Country, CurrencyConversionRequest, CurrencyConversionResponse } from '@types/currency.types';
 import { handleApiError } from '@utils/helpers';
 import { useNotificationContext } from '@context/NotificationContext';
 
 export const useCurrency = (autoFetch = true) => {
-  const [countries, setCountries] = useState<Country[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const { notifyError } = useNotificationContext();
+  const { data: countries = [], isLoading, error, refetch } = useGetCountriesQuery(undefined, {
+    skip: !autoFetch,
+  });
 
-  const fetchCountries = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await currencyService.getCountries();
-      setCountries(response.data);
-    } catch (err) {
-      const message = handleApiError(err);
-      setError(message);
-      notifyError(message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [convertCurrencyMutation, { isLoading: isConverting }] = useConvertCurrencyMutation();
 
-  const convertCurrency = async (
-    request: CurrencyConversionRequest
-  ): Promise<CurrencyConversionResponse | null> => {
-    try {
-      const response = await currencyService.convertCurrency(request);
-      return response.data;
-    } catch (err) {
-      notifyError(handleApiError(err));
-      return null;
-    }
-  };
-
-  useEffect(() => {
-    if (autoFetch) {
-      fetchCountries();
-    }
-  }, [autoFetch]);
+  const convertCurrency = useCallback(
+    async (request: CurrencyConversionRequest): Promise<CurrencyConversionResponse | null> => {
+      try {
+        const response = await convertCurrencyMutation(request).unwrap();
+        return response;
+      } catch (err) {
+        notifyError(handleApiError(err));
+        return null;
+      }
+    },
+    [convertCurrencyMutation, notifyError],
+  );
 
   return {
-    countries,
-    loading,
-    error,
-    fetchCountries,
+    countries: countries as Country[],
+    loading: isLoading || isConverting,
+    error: error ? handleApiError(error) : null,
+    fetchCountries: refetch,
     convertCurrency,
   };
 };

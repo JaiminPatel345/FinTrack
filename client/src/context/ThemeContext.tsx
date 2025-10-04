@@ -1,51 +1,41 @@
-﻿import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
-
-export type Theme = 'light' | 'dark';
-
-interface ThemeContextValue {
-  theme: Theme;
-  toggleTheme: () => void;
-  setTheme: (theme: Theme) => void;
-}
-
-const STORAGE_KEY = 'ems-theme';
-const ThemeContext = createContext<ThemeContextValue | null>(null);
-
-const resolveInitialTheme = (): Theme => {
-  const stored = localStorage.getItem(STORAGE_KEY) as Theme | null;
-  if (stored) {
-    return stored;
-  }
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  return prefersDark ? 'dark' : 'light';
-};
+import React, { useEffect } from 'react';
+import { useAppDispatch, useAppSelector } from '@store/hooks';
+import { selectTheme, setTheme as setThemeAction, toggleTheme as toggleThemeAction, Theme } from '@store/slices/themeSlice';
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [theme, setThemeState] = useState<Theme>(() => resolveInitialTheme());
+  const theme = useAppSelector(selectTheme);
 
   useEffect(() => {
-    const root = window.document.documentElement;
+    if (typeof document === 'undefined') {
+      return;
+    }
+
+    const root = document.documentElement;
     root.classList.toggle('dark', theme === 'dark');
-    localStorage.setItem(STORAGE_KEY, theme);
+    root.dataset.theme = theme;
   }, [theme]);
 
-  const setTheme = (value: Theme) => {
-    setThemeState(value);
-  };
-
-  const toggleTheme = () => {
-    setThemeState((prev) => (prev === 'dark' ? 'light' : 'dark'));
-  };
-
-  const value = useMemo(() => ({ theme, toggleTheme, setTheme }), [theme]);
-
-  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
+  return <>{children}</>;
 };
 
 export const useTheme = () => {
-  const context = useContext(ThemeContext);
-  if (!context) {
-    throw new Error('useTheme must be used within ThemeProvider');
-  }
-  return context;
+  const dispatch = useAppDispatch();
+  const theme = useAppSelector(selectTheme);
+
+  const toggleTheme = React.useCallback(() => {
+    dispatch(toggleThemeAction());
+  }, [dispatch]);
+
+  const setTheme = React.useCallback(
+    (value: Theme) => {
+      dispatch(setThemeAction(value));
+    },
+    [dispatch],
+  );
+
+  return {
+    theme,
+    toggleTheme,
+    setTheme,
+  };
 };

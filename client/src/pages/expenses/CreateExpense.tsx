@@ -1,39 +1,27 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import { ExpenseForm } from '@components/expenses/ExpenseForm';
 import { Category, ExpenseFormData } from '@types/expense.types';
-import { expensesService } from '@services/expenses.service';
 import { useNavigate } from 'react-router-dom';
 import { useNotifications } from '@hooks/useNotifications';
+import { useCreateExpenseMutation, useGetCategoriesQuery } from '@store/api/expensesApi';
+import { handleApiError } from '@utils/helpers';
 
 export const CreateExpense: React.FC = () => {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
   const { notifyError, notifySuccess } = useNotifications();
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const response = await expensesService.getCategories();
-        setCategories(response.data.categories ?? response.data);
-      } catch (error) {
-        notifyError('Failed to load categories');
-      }
-    };
-    load();
-  }, [notifyError]);
+  const { data: categoryResponse, isLoading: isLoadingCategories } = useGetCategoriesQuery();
+  const [createExpenseMutation, { isLoading: isCreating }] = useCreateExpenseMutation();
+
+  const categories = useMemo<Category[]>(() => categoryResponse?.categories ?? [], [categoryResponse?.categories]);
 
   const handleSubmit = async (data: ExpenseFormData) => {
     try {
-      setSubmitting(true);
-      const response = await expensesService.createExpense(data);
+      await createExpenseMutation(data).unwrap();
       notifySuccess('Expense created');
-      const expense = response.data.expense ?? response.data;
-      navigate(/expenses/);
+      navigate('/expenses');
     } catch (error) {
-      notifyError('Failed to create expense');
-    } finally {
-      setSubmitting(false);
+      notifyError(handleApiError(error));
     }
   };
 
@@ -43,7 +31,7 @@ export const CreateExpense: React.FC = () => {
         <h1 className="text-lg font-semibold text-neutral-900">New expense</h1>
         <p className="text-sm text-neutral-500">Capture spend details, attach receipts, and submit for approval.</p>
       </div>
-      <ExpenseForm categories={categories} onSubmit={handleSubmit} submitting={submitting} />
+      <ExpenseForm categories={categories} onSubmit={handleSubmit} submitting={isCreating} loadingCategories={isLoadingCategories} />
     </div>
   );
 };

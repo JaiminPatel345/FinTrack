@@ -1,11 +1,11 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ExpenseList } from '@components/expenses/ExpenseList';
 import { ExpenseFilters } from '@components/expenses/ExpenseFilters';
 import { Button } from '@components/common/Button';
 import { useExpenses } from '@hooks/useExpenses';
-import { expensesService } from '@services/expenses.service';
-import { Category } from '@types/expense.types';
+import { useGetCategoriesQuery } from '@store/api/expensesApi';
+import type { Category } from '@types/expense.types';
 
 export const ExpensesList: React.FC = () => {
   const navigate = useNavigate();
@@ -13,24 +13,16 @@ export const ExpensesList: React.FC = () => {
   const [categoryId, setCategoryId] = useState('');
   const [startDate, setStartDate] = useState<string | undefined>();
   const [endDate, setEndDate] = useState<string | undefined>();
-  const [categories, setCategories] = useState<Category[]>([]);
-  const { expenses, loading, fetchExpenses, submitExpense, deleteExpense } = useExpenses({ status, categoryId });
 
-  useEffect(() => {
-    const loadCategories = async () => {
-      try {
-        const response = await expensesService.getCategories();
-        setCategories(response.data.categories ?? response.data);
-      } catch (error) {
-        // ignore for now; filters will just show empty list
-      }
-    };
-    loadCategories();
-  }, []);
+  const { data: categoriesResponse } = useGetCategoriesQuery();
+  const categories = useMemo<Category[]>(() => categoriesResponse?.categories ?? [], [categoriesResponse?.categories]);
 
-  useEffect(() => {
-    fetchExpenses();
-  }, [status, categoryId]);
+  const { expenses, loading, submitExpense, deleteExpense } = useExpenses({
+    status,
+    categoryId,
+    startDate,
+    endDate,
+  });
 
   return (
     <div className="space-y-6">
@@ -59,15 +51,9 @@ export const ExpensesList: React.FC = () => {
       <ExpenseList
         expenses={expenses}
         loading={loading}
-        onSubmit={async (expenseId) => {
-          await submitExpense(expenseId);
-          fetchExpenses();
-        }}
-        onDelete={async (expenseId) => {
-          await deleteExpense(expenseId);
-          fetchExpenses();
-        }}
-        onEdit={(expense) => navigate(/expenses//edit)}
+        onSubmit={submitExpense}
+        onDelete={deleteExpense}
+        onEdit={(expense) => navigate(`/expenses/${expense.id}/edit`)}
       />
     </div>
   );

@@ -1,36 +1,18 @@
-﻿import React from 'react';
+import React from 'react';
 import AppRoutes from './routes';
-import { Toaster } from 'react-hot-toast';
+import { ThemeProvider } from '@context/ThemeContext';
+import { NotificationProvider } from '@context/NotificationContext';
+import { AuthProvider } from '@context/AuthContext';
 
 const App: React.FC = () => {
   return (
-    <>
-      <AppRoutes />
-      <Toaster 
-        position="top-right"
-        toastOptions={{
-          duration: 3000,
-          style: {
-            background: '#363636',
-            color: '#fff',
-          },
-          success: {
-            duration: 3000,
-            iconTheme: {
-              primary: '#22c55e',
-              secondary: '#fff',
-            },
-          },
-          error: {
-            duration: 4000,
-            iconTheme: {
-              primary: '#ef4444',
-              secondary: '#fff',
-            },
-          },
-        }}
-      />
-    </>
+    <ThemeProvider>
+      <NotificationProvider>
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
+      </NotificationProvider>
+    </ThemeProvider>
   );
 };
 
