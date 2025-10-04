@@ -31,9 +31,9 @@ All API requests go through the API Gateway. The client should only use this bas
 **Request Body:**
 ```json
 {
-  "name": "John Doe",
-  "email": "admin@company.com",
-  "password": "SecurePass123!",
+  "name": "Jaimin Detroja",
+  "email": "admin@bvm.com",
+  "password": "Jaimin123",
   "companyName": "Tech Solutions Inc",
   "country": "United States",
   "currency": "USD"
@@ -45,13 +45,13 @@ All API requests go through the API Gateway. The client should only use this bas
 {
   "success": true,
   "data": {
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlYWZkNjViMC1jZWE0LTQ5NTktYTI4Mi0zMTI2MjFhMzU2OGQiLCJlbWFpbCI6ImFkbWluQGJ2bS5jb20iLCJyb2xlIjoiYWRtaW4iLCJjb21wYW55SWQiOiI4ZTliYmI0YS05YjY3LTRiM2YtOTQyMi0xMGI1ZWIwM2UyYzAiLCJpYXQiOjE3NTk1Njg5MjEsImV4cCI6MTc1OTY1NTMyMX0.u1k3y5WNr8kzXYduZqZSX5GLASv0grexRn_4e8J_yZA",
     "user": {
-      "id": "550e8400-e29b-41d4-a716-446655440000",
-      "name": "John Doe",
-      "email": "admin@company.com",
+      "id": "eafd65b0-cea4-4959-a282-312621a3568d",
+      "name": "Jaimin Detroja",
+      "email": "admin@bvm.com",
       "role": "admin",
-      "companyId": "660e8400-e29b-41d4-a716-446655440000",
+      "companyId": "8e9bbb4a-9b67-4b3f-9422-10b5eb03e2c0",
       "companyName": "Tech Solutions Inc",
       "currency": "USD"
     }

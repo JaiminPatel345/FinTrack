@@ -25,6 +25,11 @@ const resetPasswordSchema = z.object({
   password: z.string().min(8, 'Password must be at least 8 characters'),
 });
 
+const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1, 'Current password is required'),
+  newPassword: z.string().min(8, 'New password must be at least 8 characters'),
+});
+
 export const authController = {
   signup: async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -130,6 +135,38 @@ export const authController = {
         data: payload,
       });
     } catch (error) {
+      next(error);
+    }
+  },
+
+  changePassword: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const validatedData = changePasswordSchema.parse(req.body);
+      
+      // Get userId from authenticated user (from JWT middleware)
+      const userId = (req as any).user?.userId;
+      
+      if (!userId) {
+        return res.status(401).json({
+          success: false,
+          error: 'Authentication required',
+        });
+      }
+
+      await authService.changePassword(userId, validatedData.currentPassword, validatedData.newPassword);
+      
+      res.status(200).json({
+        success: true,
+        message: 'Password changed successfully',
+      });
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          success: false,
+          error: 'Validation failed',
+          errors: error.errors.map(e => ({ field: e.path.join('.'), message: e.message })),
+        });
+      }
       next(error);
     }
   },

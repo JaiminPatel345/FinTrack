@@ -206,4 +206,33 @@ export const authService = {
       };
     }
   },
+
+  async changePassword(userId: string, currentPassword: string, newPassword: string) {
+    const result = await pool.query(
+      'SELECT password_hash FROM users WHERE id = $1 AND is_active = true',
+      [userId]
+    );
+
+    if (result.rows.length === 0) {
+      throw new Error('User not found');
+    }
+
+    const user = result.rows[0];
+
+    // Verify current password
+    const isValidPassword = await comparePassword(currentPassword, user.password_hash);
+    
+    if (!isValidPassword) {
+      throw new Error('Current password is incorrect');
+    }
+
+    // Hash new password
+    const hashedPassword = await hashPassword(newPassword);
+
+    // Update password
+    await pool.query(
+      'UPDATE users SET password_hash = $1, updated_at = NOW() WHERE id = $2',
+      [hashedPassword, userId]
+    );
+  },
 };

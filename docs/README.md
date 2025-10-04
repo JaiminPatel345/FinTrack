@@ -154,4 +154,22 @@ When updating documentation:
 
 ---
 
+```basy 
+# PostgreSQL - Full command in one line
+docker exec -it expense_postgres psql -U postgres -d expense_management
+
+# MongoDB - Full command in one line
+docker exec -it expense_mongodb mongosh expense_management
+
+# Redis - Full command in one line
+docker exec -it expense_redis redis-cli
+
+# Or just bash into any container
+docker exec -it expense_postgres sh
+docker exec -it expense_mongodb sh
+docker exec -it expense_redis sh
+```
+
+---
+
 **Need help?** Check [SETUP.md](./SETUP.md) for troubleshooting or create an issue on GitHub.
