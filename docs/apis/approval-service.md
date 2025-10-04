@@ -6,7 +6,64 @@ All endpoints require authentication.
 
 ## Endpoints
 
-### 1. Get Pending Approvals
+### 1. Create Approval Workflow
+
+**Purpose**: Create approval workflow when expense is submitted (called by expense-service).
+
+**Endpoint:** `POST /approvals/create-workflow`
+
+**Authentication:** Not required (internal service call)
+
+**Request Body:**
+```json
+{
+  "expenseId": "expense-uuid",
+  "userId": "user-uuid",
+  "companyId": "company-uuid"
+}
+```
+
+**Business Logic:**
+1. Finds matching approval rule based on:
+   - Category (if specified)
+   - Amount range (min_amount, max_amount)
+   - Priority (highest priority rule wins)
+2. If `is_manager_approver = true`, adds employee's manager as Step 0
+3. Adds configured approvers from `approval_steps` table
+4. Creates `expense_approval` record with total_steps and current_step
+5. Creates `approval_actions` for each approver (status: pending)
+6. Updates expense status to `pending_approval`
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "expenseApprovalId": "approval-uuid",
+    "rule": {
+      "id": "rule-uuid",
+      "name": "Standard Approval",
+      "rule_type": "sequential",
+      "is_manager_approver": true
+    },
+    "steps": [
+      {
+        "step_order": 0,
+        "approver_id": "manager-uuid"
+      },
+      {
+        "step_order": 1,
+        "approver_id": "finance-head-uuid"
+      }
+    ],
+    "currentStep": 1
+  }
+}
+```
+
+---
+
+### 2. Get Pending Approvals
 
 Get all pending approvals for the logged-in user.
 
@@ -20,17 +77,19 @@ Get all pending approvals for the logged-in user.
   "success": true,
   "data": [
     {
-      "id": 1,
-      "expense_id": 5,
-      "approver_id": 2,
-      "status": "pending",
-      "step_order": 1,
-      "title": "Business Lunch",
-      "total_amount": 125.50,
-      "currency": "USD",
-      "first_name": "John",
-      "last_name": "Doe",
-      "created_at": "2024-10-04T12:00:00.000Z"
+      "expense_id": "expense-uuid",
+      "description": "Business Lunch",
+      "amount": 125.50,
+      "currency": "INR",
+      "converted_amount": 1.48,
+      "expense_date": "2024-10-03",
+      "employee_name": "John Doe",
+      "employee_email": "john@company.com",
+      "approval_id": "approval-uuid",
+      "current_step": 1,
+      "total_steps": 3,
+      "action_id": "action-uuid",
+      "step_order": 1
     }
   ]
 }
@@ -73,16 +132,16 @@ Get all approvals for a specific expense.
 
 ---
 
-### 3. Approve Expense
+### 4. Approve Expense
 
-Approve an expense.
+**Purpose**: Approve an expense at current approval step.
 
 **Endpoint:** `POST /approvals/:id/approve`
 
 **Authentication:** Required
 
 **URL Parameters:**
-- `id` (number): Approval ID
+- `id` (UUID): Approval Action ID (not expense ID)
 
 **Request Body:**
 ```json
@@ -91,32 +150,53 @@ Approve an expense.
 }
 ```
 
+**Approval Logic by Rule Type:**
+
+**Sequential:**
+- If current step approves → Move to next step
+- If last step approves → Expense approved
+
+**Percentage (e.g., 60% required):**
+- Calculate: (approved_count / total_steps) × 100
+- If percentage >= required → Expense approved
+
+**Specific Approver:**
+- If this approver has `is_auto_approve = true` → Expense auto-approved
+
+**Hybrid (Percentage OR Specific Approver):**
+- If percentage >= required → Expense approved
+- OR if specific approver approves → Expense auto-approved
+
 **Success Response (200):**
 ```json
 {
   "success": true,
   "data": {
-    "id": 1,
-    "expense_id": 5,
-    "status": "approved",
-    "comments": "Looks good, approved",
-    "approved_at": "2024-10-04T14:30:00.000Z"
+    "action": {
+      "id": "action-uuid",
+      "action": "approved",
+      "comments": "Looks good, approved",
+      "action_date": "2024-10-04T14:30:00.000Z"
+    },
+    "isApproved": false,
+    "shouldMoveToNext": true,
+    "currentStep": 2
   }
 }
 ```
 
 ---
 
-### 4. Reject Expense
+### 5. Reject Expense
 
-Reject an expense.
+**Purpose**: Reject an expense (immediately rejects entire workflow).
 
 **Endpoint:** `POST /approvals/:id/reject`
 
 **Authentication:** Required
 
 **URL Parameters:**
-- `id` (number): Approval ID
+- `id` (UUID): Approval Action ID
 
 **Request Body:**
 ```json
@@ -125,16 +205,23 @@ Reject an expense.
 }
 ```
 
+**Business Logic:**
+- Any rejection immediately rejects the entire expense
+- No further approvals needed after rejection
+- Updates expense status to `rejected`
+
 **Success Response (200):**
 ```json
 {
   "success": true,
   "data": {
-    "id": 1,
-    "expense_id": 5,
-    "status": "rejected",
-    "comments": "Missing receipt, please resubmit",
-    "approved_at": "2024-10-04T14:30:00.000Z"
+    "action": {
+      "id": "action-uuid",
+      "action": "rejected",
+      "comments": "Missing receipt, please resubmit",
+      "action_date": "2024-10-04T14:30:00.000Z"
+    },
+    "expenseId": "expense-uuid"
   }
 }
 ```

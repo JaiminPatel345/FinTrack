@@ -4,9 +4,24 @@ import { ApprovalService } from '../services/approval.service';
 const approvalService = new ApprovalService();
 
 export class ApprovalController {
+  async createApprovalWorkflow(req: Request, res: Response) {
+    try {
+      const { expenseId, userId, companyId } = req.body;
+      
+      if (!expenseId || !userId || !companyId) {
+        return res.status(400).json({ success: false, message: 'Missing required fields' });
+      }
+      
+      const workflow = await approvalService.createApprovalWorkflow(expenseId, userId, companyId);
+      res.json({ success: true, data: workflow });
+    } catch (error: any) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  }
+
   async getExpenseApprovals(req: Request, res: Response) {
     try {
-      const expenseId = parseInt(req.params.expenseId);
+      const expenseId = req.params.expenseId;
       const approvals = await approvalService.getExpenseApprovals(expenseId);
       res.json({ success: true, data: approvals });
     } catch (error: any) {
@@ -28,11 +43,11 @@ export class ApprovalController {
 
   async approveExpense(req: Request, res: Response) {
     try {
-      const approvalId = parseInt(req.params.id);
+      const actionId = req.params.id;
       const approverId = (req as any).user.userId;
       const { comments } = req.body;
       
-      const approval = await approvalService.approveExpense(approvalId, approverId, comments);
+      const approval = await approvalService.approveExpense(actionId, approverId, comments);
       res.json({ success: true, data: approval });
     } catch (error: any) {
       res.status(500).json({ success: false, message: error.message });
@@ -41,7 +56,7 @@ export class ApprovalController {
 
   async rejectExpense(req: Request, res: Response) {
     try {
-      const approvalId = parseInt(req.params.id);
+      const actionId = req.params.id;
       const approverId = (req as any).user.userId;
       const { comments } = req.body;
       
@@ -49,7 +64,7 @@ export class ApprovalController {
         return res.status(400).json({ success: false, message: 'Comments are required for rejection' });
       }
       
-      const approval = await approvalService.rejectExpense(approvalId, approverId, comments);
+      const approval = await approvalService.rejectExpense(actionId, approverId, comments);
       res.json({ success: true, data: approval });
     } catch (error: any) {
       res.status(500).json({ success: false, message: error.message });
@@ -87,7 +102,7 @@ export class ApprovalController {
 
   async updateApprovalRule(req: Request, res: Response) {
     try {
-      const ruleId = parseInt(req.params.id);
+      const ruleId = req.params.id;
       const companyId = (req as any).user.companyId;
       
       // Only admins can update rules
@@ -104,7 +119,7 @@ export class ApprovalController {
 
   async getApprovalHistory(req: Request, res: Response) {
     try {
-      const expenseId = parseInt(req.params.expenseId);
+      const expenseId = req.params.expenseId;
       const history = await approvalService.getApprovalHistory(expenseId);
       res.json({ success: true, data: history });
     } catch (error: any) {

@@ -23,7 +23,7 @@ export class ExpenseController {
 
   async getExpenseById(req: Request, res: Response) {
     try {
-      const expenseId = parseInt(req.params.id);
+      const expenseId = req.params.id;
       const companyId = (req as any).user.companyId;
       
       const expense = await expenseService.getExpenseById(expenseId, companyId);
@@ -129,11 +129,12 @@ export class ExpenseController {
 
   async submitExpense(req: Request, res: Response) {
     try {
-      const expenseId = parseInt(req.params.id);
+      const expenseId = req.params.id;
+      const userId = (req as any).user.userId;
       const companyId = (req as any).user.companyId;
       
-      const expense = await expenseService.submitExpense(expenseId, companyId);
-      res.json({ success: true, data: expense });
+      const expense = await expenseService.submitExpense(expenseId, userId, companyId);
+      res.json({ success: true, data: expense, message: 'Expense submitted for approval' });
     } catch (error: any) {
       res.status(500).json({ success: false, message: error.message });
     }

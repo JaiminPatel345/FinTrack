@@ -79,8 +79,20 @@ export class UserService {
 
       await client.query('COMMIT');
 
-      // TODO: Send password setup email via notification service
-      // For now, return the temp password (in production, this should be sent via email only)
+      // Send password setup email via notification service
+      const axios = require('axios');
+      const NOTIFICATION_SERVICE_URL = process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:5007';
+      
+      try {
+        await axios.post(`${NOTIFICATION_SERVICE_URL}/api/notifications/send-password`, {
+          email: data.email,
+          name: data.name,
+          tempPassword: tempPassword
+        });
+      } catch (error) {
+        console.error('Failed to send password email:', error);
+      }
+
       return {
         user: result.rows[0],
         tempPassword: tempPassword
@@ -232,6 +244,9 @@ export class UserService {
   }
 
   async sendPasswordSetupEmail(userId: string, companyId: string) {
+    const axios = require('axios');
+    const NOTIFICATION_SERVICE_URL = process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:5007';
+
     // Get user details
     const result = await pool.query(
       'SELECT id, name, email FROM users WHERE id = $1 AND company_id = $2',
@@ -254,8 +269,17 @@ export class UserService {
       [hashedPassword, userId]
     );
 
-    // TODO: Send email via notification service
-    // For now, return the temp password
+    // Send email via notification service
+    try {
+      await axios.post(`${NOTIFICATION_SERVICE_URL}/api/notifications/send-password`, {
+        email: user.email,
+        name: user.name,
+        tempPassword: tempPassword
+      });
+    } catch (error) {
+      console.error('Failed to send password email:', error);
+    }
+
     return {
       success: true,
       tempPassword: tempPassword,

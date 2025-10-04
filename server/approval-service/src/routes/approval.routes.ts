@@ -4,6 +4,9 @@ import { ApprovalController } from '../controllers/approval.controller';
 const router = Router();
 const approvalController = new ApprovalController();
 
+// Create approval workflow for expense (called by expense service)
+router.post('/create-workflow', (req, res) => approvalController.createApprovalWorkflow(req, res));
+
 // Get pending approvals for logged-in user
 router.get('/pending', (req, res) => approvalController.getPendingApprovals(req, res));
 

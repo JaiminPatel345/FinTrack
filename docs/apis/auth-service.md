@@ -2,98 +2,114 @@
 
 Base URL: `/auth` (via API Gateway at `http://localhost:5000`)
 
+## Important: Authentication Flow
+
+### User Roles & Registration:
+- **Admin**: Only 1 admin per company. Admin is created during company signup.
+- **Employee/Manager**: Created by admin through User Service (not through auth/register).
+- **Signin**: All users (Admin, Manager, Employee) use the same signin endpoint.
+
+---
+
 ## Endpoints
 
-### 1. Register User
+### 1. Company Signup (Admin Registration)
 
-Create a new user account.
+**Purpose**: Register a new company with its first admin user. This is the ONLY way to create an admin user.
 
-**Endpoint:** `POST /auth/register`
+**Endpoint:** `POST /auth/signup`
 
 **Authentication:** Not required
+
+**Business Rules:**
+- Creates both company and admin user in a single transaction
+- Only ONE admin per company allowed (enforced by database constraint)
+- Admin role cannot be assigned through any other endpoint
+- This endpoint is used ONLY for initial company setup
 
 **Request Body:**
 ```json
 {
-  "email": "user@example.com",
+  "name": "John Doe",
+  "email": "admin@company.com",
   "password": "SecurePassword123!",
-  "firstName": "John",
-  "lastName": "Doe",
-  "companyName": "Acme Corp",
-  "role": "employee",
-  "department": "Engineering",
-  "phone": "+1234567890"
+  "confirmPassword": "SecurePassword123!",
+  "country": "United States",
+  "companyName": "Acme Corporation"
 }
 ```
 
 **Validation Rules:**
-- `email`: Valid email format, unique
-- `password`: Minimum 8 characters, at least one uppercase, one lowercase, one number
-- `firstName`: Required, 2-50 characters
-- `lastName`: Required, 2-50 characters
-- `companyName`: Required for first user, 2-100 characters
-- `role`: Optional, one of: `employee`, `manager`, `finance`, `admin` (default: `employee`)
-- `department`: Optional, 2-50 characters
-- `phone`: Optional, valid phone format
+- `name`: Required, 2-100 characters
+- `email`: Required, valid email format, must be unique across all users
+- `password`: Required, minimum 8 characters, at least one uppercase, one lowercase, one number
+- `confirmPassword`: Required, must match password
+- `country`: Required, must be a valid country name (fetched from restcountries.com API)
+- `companyName`: Optional, defaults to "{name}'s Company" if not provided
 
 **Success Response (201):**
 ```json
 {
   "success": true,
   "data": {
-    "user": {
-      "id": 1,
-      "email": "user@example.com",
-      "firstName": "John",
-      "lastName": "Doe",
-      "role": "employee",
-      "companyId": 1,
-      "department": "Engineering",
-      "phone": "+1234567890",
-      "isActive": true,
-      "createdAt": "2024-10-04T10:30:00.000Z"
-    },
     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    "company": {
-      "id": 1,
-      "name": "Acme Corp"
+    "user": {
+      "id": "uuid-here",
+      "name": "John Doe",
+      "email": "admin@company.com",
+      "role": "admin",
+      "companyId": "company-uuid",
+      "companyName": "Acme Corporation",
+      "currency": "USD"
     }
-  }
+  },
+  "message": "Company and admin user created successfully"
 }
 ```
 
 **Error Responses:**
 
-400 Bad Request:
+400 Bad Request - Email exists:
 ```json
 {
   "success": false,
-  "message": "Email already registered"
+  "message": "Email already exists"
 }
 ```
 
+400 Bad Request - Password mismatch:
 ```json
 {
   "success": false,
-  "message": "Password does not meet requirements"
+  "message": "Passwords do not match"
+}
+```
+
+400 Bad Request - Invalid country:
+```json
+{
+  "success": false,
+  "message": "Invalid country selected"
 }
 ```
 
 ---
 
-### 2. Login
+### 2. Signin (Login)
 
-Authenticate and get JWT token.
+**Purpose**: Authenticate any user (Admin, Manager, or Employee) and get JWT token.
 
-**Endpoint:** `POST /auth/login`
+**Endpoint:** `POST /auth/signin`
 
 **Authentication:** Not required
+
+**Used By:** All users (Admin, Manager, Employee)
 
 **Request Body:**
 ```json
 {
-  "email": "user@example.com",
-  "password": "SecurePassword123!"
+  "email": "user@company.com",
+  "password": "UserPassword123!"
 }
 ```
 
@@ -102,25 +118,28 @@ Authenticate and get JWT token.
 {
   "success": true,
   "data": {
-    "user": {
-      "id": 1,
-      "email": "user@example.com",
-      "firstName": "John",
-      "lastName": "Doe",
-      "role": "employee",
-      "companyId": 1,
-      "department": "Engineering",
-      "isActive": true
-    },
     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    "expiresIn": "24h"
+    "user": {
+      "id": "uuid-here",
+      "name": "John Doe",
+      "email": "user@company.com",
+      "role": "employee",
+      "companyId": "company-uuid",
+      "companyName": "Acme Corporation",
+      "currency": "USD"
+    }
   }
 }
 ```
 
+**Response Fields:**
+- `token`: JWT token valid for 24 hours
+- `user.role`: One of `admin`, `manager`, or `employee`
+- `currency`: Company's base currency code (e.g., USD, EUR, INR)
+
 **Error Responses:**
 
-401 Unauthorized:
+401 Unauthorized - Invalid credentials:
 ```json
 {
   "success": false,
@@ -128,7 +147,7 @@ Authenticate and get JWT token.
 }
 ```
 
-403 Forbidden:
+403 Forbidden - Account deactivated:
 ```json
 {
   "success": false,
@@ -312,28 +331,39 @@ Reset password using reset token from email.
 ### User Object
 ```typescript
 {
-  id: number;
+  id: string;              // UUID
   email: string;
-  firstName: string;
-  lastName: string;
-  role: 'employee' | 'manager' | 'finance' | 'admin';
-  companyId: number;
-  department?: string;
-  phone?: string;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt?: string;
+  name: string;            // Full name
+  role: 'employee' | 'manager' | 'admin';
+  company_id: string;      // UUID
+  currency: string;        // e.g., "USD", "EUR", "INR"
+  is_active: boolean;
+  created_at: string;      // ISO 8601 timestamp
+  updated_at?: string;     // ISO 8601 timestamp
 }
 ```
 
 ### JWT Token Payload
 ```typescript
 {
-  userId: number;
+  userId: string;          // UUID
   email: string;
-  companyId: number;
-  role: string;
-  iat: number;  // Issued at
-  exp: number;  // Expires at
+  companyId: string;       // UUID
+  role: 'employee' | 'manager' | 'admin';
+  currency: string;
+  iat: number;             // Issued at (Unix timestamp)
+  exp: number;             // Expires at (Unix timestamp, 24h from issue)
+}
+```
+
+### Company Object
+```typescript
+{
+  id: string;              // UUID
+  name: string;
+  currency: string;        // e.g., "USD", "EUR", "INR"
+  is_active: boolean;
+  created_at: string;      // ISO 8601 timestamp
+  updated_at?: string;     // ISO 8601 timestamp
 }
 ```
