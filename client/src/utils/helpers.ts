@@ -50,14 +50,23 @@ export const clearLocalStorage = (): void => {
  * Get auth token from localStorage
  */
 export const getAuthToken = (): string | null => {
-  return getLocalStorage<string>(STORAGE_KEYS.AUTH_TOKEN);
+  try {
+    return localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
+  } catch (error) {
+    console.error('Error reading auth token from localStorage:', error);
+    return null;
+  }
 };
 
 /**
  * Set auth token in localStorage
  */
 export const setAuthToken = (token: string): void => {
-  setLocalStorage(STORAGE_KEYS.AUTH_TOKEN, token);
+  try {
+    localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
+  } catch (error) {
+    console.error('Error setting auth token in localStorage:', error);
+  }
 };
 
 /**

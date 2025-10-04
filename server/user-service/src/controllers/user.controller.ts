@@ -1,17 +1,22 @@
 import { Request, Response } from 'express';
 import { UserService } from '../services/user.service';
+import { JwtPayload, UserRole } from '../types/auth.types';
+
+// Extend Request interface
+interface AuthenticatedRequest extends Request {
+  user: JwtPayload;
+}
 
 const userService = new UserService();
 
 export class UserController {
   // GET /api/users - Get all users (Admin only)
-  async getAllUsers(req: Request, res: Response) {
+  async getAllUsers(req: AuthenticatedRequest, res: Response) {
     try {
-      const companyId = (req as any).user.companyId;
-      const role = (req as any).user.role;
+      const { companyId, role } = req.user;
 
       // Only admin can view all users
-      if (role !== 'admin') {
+      if (role !== UserRole.ADMIN) {
         return res.status(403).json({ success: false, message: 'Unauthorized' });
       }
 
@@ -23,10 +28,10 @@ export class UserController {
   }
 
   // GET /api/users/:id - Get user by ID
-  async getUserById(req: Request, res: Response) {
+  async getUserById(req: AuthenticatedRequest, res: Response) {
     try {
       const userId = req.params.id;
-      const companyId = (req as any).user.companyId;
+      const { companyId } = req.user;
       
       const user = await userService.getUserById(userId, companyId);
       if (!user) {
@@ -40,13 +45,12 @@ export class UserController {
   }
 
   // POST /api/users - Create user (Admin only)
-  async createUser(req: Request, res: Response) {
+  async createUser(req: AuthenticatedRequest, res: Response) {
     try {
-      const companyId = (req as any).user.companyId;
-      const role = (req as any).user.role;
+      const { companyId, role } = req.user;
 
       // Only admin can create users
-      if (role !== 'admin') {
+      if (role !== UserRole.ADMIN) {
         return res.status(403).json({ success: false, message: 'Unauthorized' });
       }
 
@@ -76,15 +80,13 @@ export class UserController {
   }
 
   // PUT /api/users/:id - Update user
-  async updateUser(req: Request, res: Response) {
+  async updateUser(req: AuthenticatedRequest, res: Response) {
     try {
       const userId = req.params.id;
-      const companyId = (req as any).user.companyId;
-      const requestUserId = (req as any).user.userId;
-      const requestUserRole = (req as any).user.role;
+      const { companyId, userId: requestUserId, role: requestUserRole } = req.user;
 
       // Users can only update their own profile unless they're admin
-      if (userId !== requestUserId && requestUserRole !== 'admin') {
+      if (userId !== requestUserId && requestUserRole !== UserRole.ADMIN) {
         return res.status(403).json({ success: false, message: 'Unauthorized' });
       }
 
@@ -96,14 +98,13 @@ export class UserController {
   }
 
   // DELETE /api/users/:id - Deactivate user (Admin only)
-  async deleteUser(req: Request, res: Response) {
+  async deleteUser(req: AuthenticatedRequest, res: Response) {
     try {
       const userId = req.params.id;
-      const companyId = (req as any).user.companyId;
-      const role = (req as any).user.role;
+      const { companyId, role } = req.user;
 
       // Only admins can delete users
-      if (role !== 'admin') {
+      if (role !== UserRole.ADMIN) {
         return res.status(403).json({ success: false, message: 'Unauthorized' });
       }
 
@@ -115,14 +116,13 @@ export class UserController {
   }
 
   // POST /api/users/:id/send-password - Send password setup email (Admin only)
-  async sendPasswordSetupEmail(req: Request, res: Response) {
+  async sendPasswordSetupEmail(req: AuthenticatedRequest, res: Response) {
     try {
       const userId = req.params.id;
-      const companyId = (req as any).user.companyId;
-      const role = (req as any).user.role;
+      const { companyId, role } = req.user;
 
       // Only admins can send password setup emails
-      if (role !== 'admin') {
+      if (role !== UserRole.ADMIN) {
         return res.status(403).json({ success: false, message: 'Unauthorized' });
       }
 
@@ -138,10 +138,10 @@ export class UserController {
   }
 
   // GET /api/users/:id/manager - Get user's manager
-  async getUserManager(req: Request, res: Response) {
+  async getUserManager(req: AuthenticatedRequest, res: Response) {
     try {
       const userId = req.params.id;
-      const companyId = (req as any).user.companyId;
+      const { companyId } = req.user;
       
       const manager = await userService.getUserManager(userId, companyId);
       res.json({ success: true, data: manager });
@@ -151,15 +151,14 @@ export class UserController {
   }
 
   // POST /api/users/:id/manager - Assign manager (Admin only)
-  async assignManager(req: Request, res: Response) {
+  async assignManager(req: AuthenticatedRequest, res: Response) {
     try {
       const userId = req.params.id;
       const { managerId } = req.body;
-      const companyId = (req as any).user.companyId;
-      const role = (req as any).user.role;
+      const { companyId, role } = req.user;
 
       // Only admin can assign managers
-      if (role !== 'admin') {
+      if (role !== UserRole.ADMIN) {
         return res.status(403).json({ success: false, message: 'Unauthorized' });
       }
 
@@ -175,10 +174,10 @@ export class UserController {
   }
 
   // GET /api/users/:id/subordinates - Get user's subordinates
-  async getUserSubordinates(req: Request, res: Response) {
+  async getUserSubordinates(req: AuthenticatedRequest, res: Response) {
     try {
       const userId = req.params.id;
-      const companyId = (req as any).user.companyId;
+      const { companyId } = req.user;
       
       const subordinates = await userService.getUserSubordinates(userId, companyId);
       res.json({ success: true, data: subordinates });

@@ -1,6 +1,12 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import { UserController } from '../controllers/user.controller';
-import { authenticate, authorize } from '../../../shared/middleware/auth.middleware';
+import { authenticate, authorize } from '../middleware/auth.middleware';
+import { UserRole, JwtPayload } from '../types/auth.types';
+
+// Extend Request interface
+interface AuthenticatedRequest extends Request {
+  user: JwtPayload;
+}
 
 const router = Router();
 const userController = new UserController();
@@ -9,30 +15,48 @@ const userController = new UserController();
 router.use(authenticate);
 
 // GET /api/users - Get all users (Admin only)
-router.get('/', authorize('admin'), (req, res) => userController.getAllUsers(req, res));
+router.get('/', authorize(UserRole.ADMIN), (req: Request, res: Response) => 
+  userController.getAllUsers(req as AuthenticatedRequest, res)
+);
 
 // GET /api/users/:id - Get user by ID
-router.get('/:id', (req, res) => userController.getUserById(req, res));
+router.get('/:id', (req: Request, res: Response) => 
+  userController.getUserById(req as AuthenticatedRequest, res)
+);
 
 // POST /api/users - Create user (Admin only)
-router.post('/', authorize('admin'), (req, res) => userController.createUser(req, res));
+router.post('/', authorize(UserRole.ADMIN), (req: Request, res: Response) => 
+  userController.createUser(req as AuthenticatedRequest, res)
+);
 
 // PUT /api/users/:id - Update user
-router.put('/:id', (req, res) => userController.updateUser(req, res));
+router.put('/:id', (req: Request, res: Response) => 
+  userController.updateUser(req as AuthenticatedRequest, res)
+);
 
 // DELETE /api/users/:id - Deactivate user (Admin only)
-router.delete('/:id', authorize('admin'), (req, res) => userController.deleteUser(req, res));
+router.delete('/:id', authorize(UserRole.ADMIN), (req: Request, res: Response) => 
+  userController.deleteUser(req as AuthenticatedRequest, res)
+);
 
 // POST /api/users/:id/send-password - Send password setup email (Admin only)
-router.post('/:id/send-password', authorize('admin'), (req, res) => userController.sendPasswordSetupEmail(req, res));
+router.post('/:id/send-password', authorize(UserRole.ADMIN), (req: Request, res: Response) => 
+  userController.sendPasswordSetupEmail(req as AuthenticatedRequest, res)
+);
 
 // GET /api/users/:id/manager - Get user's manager
-router.get('/:id/manager', (req, res) => userController.getUserManager(req, res));
+router.get('/:id/manager', (req: Request, res: Response) => 
+  userController.getUserManager(req as AuthenticatedRequest, res)
+);
 
 // POST /api/users/:id/manager - Assign manager to user (Admin only)
-router.post('/:id/manager', authorize('admin'), (req, res) => userController.assignManager(req, res));
+router.post('/:id/manager', authorize(UserRole.ADMIN), (req: Request, res: Response) => 
+  userController.assignManager(req as AuthenticatedRequest, res)
+);
 
 // GET /api/users/:id/subordinates - Get user's subordinates
-router.get('/:id/subordinates', (req, res) => userController.getUserSubordinates(req, res));
+router.get('/:id/subordinates', (req: Request, res: Response) => 
+  userController.getUserSubordinates(req as AuthenticatedRequest, res)
+);
 
 export default router;
