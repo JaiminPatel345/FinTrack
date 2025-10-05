@@ -1,5 +1,4 @@
-# Do not copy my code :/ 
-### We will update name later so google can't find our repo :)
+# FinTrack - An Expense managemnt SaaS
 
 A comprehensive microservices-based expense management system with multi-currency support, OCR receipt processing, and configurable approval workflows.
 
